@@ -1,0 +1,23 @@
+{
+  "name": "icelink-client",
+  "homepage": "https://github.com/arjun-g/bower-icelink",
+  "authors": [
+    "Arjun Ganesan <arjun@arjun-g.com>"
+  ],
+  "description": "Shim repository for Frozen Mountain's IceLink js libraries",
+  "main": [
+    "fm.js",
+    "fm.icelink.js",
+    "fm.icelink.webrtc.js"
+  ],
+  "moduleType": [],
+  "keywords": [
+    "forzen",
+    "mountain",
+    "fm",
+    "icelink",
+    "webrtc"
+  ],
+  "license": "MIT",
+  "version": "2.8.8"
+}
