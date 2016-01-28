@@ -1,7 +1,7 @@
 
 /*
  * Title: IceLink for JavaScript
- * Version: 2.8.8
+ * Version: 2.8.9
  * Copyright Frozen Mountain Software 2011+
  */
 
@@ -25,7 +25,7 @@ if (!window.fm) { throw new Error("fm must be loaded before fm.icelink."); }
 if (!window.fm.icelink) { window.fm.icelink = {}; }
 
 fm.icelink.getVersion = function() {
-  return '2.8.8';
+  return '2.8.9';
 };
 
 

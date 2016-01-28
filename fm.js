@@ -1,7 +1,7 @@
 
 /*
  * Title: FM Core for JavaScript
- * Version: 2.8.8
+ * Version: 2.8.9
  * Copyright Frozen Mountain Software 2011+
  */
 
@@ -497,7 +497,7 @@ if (!JSON) {
 }());
 
 fm.getVersion = function() {
-  return '2.8.8';
+  return '2.8.9';
 };
 
 

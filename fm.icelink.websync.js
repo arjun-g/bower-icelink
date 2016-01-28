@@ -1,7 +1,7 @@
 
 /*
  * Title: IceLink WebSync Extension for JavaScript
- * Version: 2.8.8
+ * Version: 2.8.9
  * Copyright Frozen Mountain Software 2011+
  */
 
@@ -27,7 +27,7 @@ if (!window.fm.icelink) { throw new Error("fm.icelink must be loaded before fm.i
 if (!window.fm.icelink.websync) { window.fm.icelink.websync = {}; }
 
 fm.icelink.websync.getVersion = function() {
-  return '2.8.8';
+  return '2.8.9';
 };
 
 

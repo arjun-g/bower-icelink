@@ -1,7 +1,7 @@
 
 /*
  * Title: IceLink WebRTC Extension for JavaScript
- * Version: 2.8.8
+ * Version: 2.8.9
  * Copyright Frozen Mountain Software 2011+
  */
 
@@ -27,7 +27,7 @@ if (!window.fm.icelink) { throw new Error("fm.icelink must be loaded before fm.i
 if (!window.fm.icelink.webrtc) { window.fm.icelink.webrtc = {}; }
 
 fm.icelink.webrtc.getVersion = function() {
-  return '2.8.8';
+  return '2.8.9';
 };
 
 
@@ -3354,32 +3354,49 @@ fm.icelink.webrtc.layoutPreset = (function(superClass) {
     this.setBlockHeightPercent = bind(this.setBlockHeightPercent, this);
     this.setBlockHeight = bind(this.setBlockHeight, this);
     this.setAlignment = bind(this.setAlignment, this);
+    this.getTopRowIndexes = bind(this.getTopRowIndexes, this);
+    this.getRightColumnIndexes = bind(this.getRightColumnIndexes, this);
     this.getPreviewSize = bind(this.getPreviewSize, this);
     this.getPreviewPadding = bind(this.getPreviewPadding, this);
     this.getPreviewMode = bind(this.getPreviewMode, this);
     this.getPreviewAlignment = bind(this.getPreviewAlignment, this);
     this.getMode = bind(this.getMode, this);
+    this.getLeftColumnIndexes = bind(this.getLeftColumnIndexes, this);
     this.getInlineMargin = bind(this.getInlineMargin, this);
+    this.getInlineLayout = bind(this.getInlineLayout, this);
     this.getFloatWidthPercent = bind(this.getFloatWidthPercent, this);
     this.getFloatWidth = bind(this.getFloatWidth, this);
+    this.getFloatRemoteLayout = bind(this.getFloatRemoteLayout, this);
     this.getFloatMarginYPercent = bind(this.getFloatMarginYPercent, this);
     this.getFloatMarginY = bind(this.getFloatMarginY, this);
     this.getFloatMarginXPercent = bind(this.getFloatMarginXPercent, this);
     this.getFloatMarginX = bind(this.getFloatMarginX, this);
+    this.getFloatLocalLayout = bind(this.getFloatLocalLayout, this);
     this.getFloatHeightPercent = bind(this.getFloatHeightPercent, this);
     this.getFloatHeight = bind(this.getFloatHeight, this);
     this.getDirection = bind(this.getDirection, this);
+    this.getCenterRowIndexes = bind(this.getCenterRowIndexes, this);
+    this.getCenterColumnIndexes = bind(this.getCenterColumnIndexes, this);
     this.getCellMargin = bind(this.getCellMargin, this);
+    this.getBottomRowIndexes = bind(this.getBottomRowIndexes, this);
     this.getBlockWidthPercent = bind(this.getBlockWidthPercent, this);
     this.getBlockWidth = bind(this.getBlockWidth, this);
     this.getBlockMarginYPercent = bind(this.getBlockMarginYPercent, this);
     this.getBlockMarginY = bind(this.getBlockMarginY, this);
     this.getBlockMarginXPercent = bind(this.getBlockMarginXPercent, this);
     this.getBlockMarginX = bind(this.getBlockMarginX, this);
+    this.getBlockLayout = bind(this.getBlockLayout, this);
     this.getBlockHeightPercent = bind(this.getBlockHeightPercent, this);
     this.getBlockHeight = bind(this.getBlockHeight, this);
     this.getAlignment = bind(this.getAlignment, this);
     this.copyToPreset = bind(this.copyToPreset, this);
+    this.calculateLayout = bind(this.calculateLayout, this);
+    this.calculateInlineFrames = bind(this.calculateInlineFrames, this);
+    this.calculateInlineFrame = bind(this.calculateInlineFrame, this);
+    this.calculateFloatFrames = bind(this.calculateFloatFrames, this);
+    this.calculateFloatFrame = bind(this.calculateFloatFrame, this);
+    this.calculateFillFrame = bind(this.calculateFillFrame, this);
+    this.calculateBlockFrame = bind(this.calculateBlockFrame, this);
     this.applyPreset = bind(this.applyPreset, this);
     var instance;
     if (arguments.length === 1 && fm.util.isPlainObject(arguments[0])) {
@@ -3428,6 +3445,40 @@ fm.icelink.webrtc.layoutPreset = (function(superClass) {
     this.setAlignment(fm.icelink.webrtc.layoutAlignment.BottomRight);
     return instance;
   }
+
+  layoutPreset.calculateTable = function() {
+    var cellWidth, count, i, num, num2, num3, num5, num6, num7, num8, tableHeight, tableWidth;
+    tableWidth = arguments[0];
+    tableHeight = arguments[1];
+    count = arguments[2];
+    num = 0;
+    num2 = 1;
+    num3 = 1;
+    i = count;
+    while (i >= 1) {
+      try {
+        num5 = fm.mathAssistant.ceil(count / i);
+        num6 = tableWidth / i;
+        num7 = tableHeight / num5;
+        num8 = (num6 < num7 ? num6 : num7);
+        if (num8 >= num) {
+          num = num8;
+          num2 = i;
+          num3 = num5;
+        }
+      } finally {
+        i--;
+      }
+    }
+    cellWidth = fm.mathAssistant.floor(tableWidth / num2);
+    return new fm.icelink.webrtc.layoutTable(num2, num3, cellWidth, fm.mathAssistant.floor(tableHeight / num3));
+  };
+
+  layoutPreset.divideByTwo = function() {
+    var value;
+    value = arguments[0];
+    return fm.mathAssistant.floor(value / 2);
+  };
 
 
   /*<span id='method-fm.icelink.webrtc.layoutPreset-getFacetime'>&nbsp;</span> */
@@ -3492,6 +3543,15 @@ fm.icelink.webrtc.layoutPreset = (function(superClass) {
     return preset2;
   };
 
+  layoutPreset.getSingleLayout = function() {
+    var layout, layoutHeight, layoutWidth;
+    layoutWidth = arguments[0];
+    layoutHeight = arguments[1];
+    layout = new fm.icelink.webrtc.layout();
+    layout.setLocalFrame(new fm.icelink.webrtc.layoutFrame(0, 0, layoutWidth, layoutHeight));
+    return layout;
+  };
+
 
   /*<span id='method-fm.icelink.webrtc.layoutPreset-getSkype'>&nbsp;</span> */
 
@@ -3522,6 +3582,223 @@ fm.icelink.webrtc.layoutPreset = (function(superClass) {
     preset.setBlockHeightPercent(0.333333333333333);
     preset.setInlineMargin(10);
     return preset;
+  };
+
+  layoutPreset.getXMax = function() {
+    var frame, frames, i, x;
+    frames = arguments[0];
+    if (fm.global.equals(frames.length, 0)) {
+      return frames[0].getX();
+    }
+    x = frames[0].getX();
+    i = 1;
+    while (i < frames.length) {
+      try {
+        frame = frames[i];
+        if (frame.getX() > x) {
+          x = frame.getX();
+        }
+      } finally {
+        i++;
+      }
+    }
+    return x;
+  };
+
+  layoutPreset.getXMid = function() {
+    var frame, frames, i, num3, num5, num7, x, xMax, xMin;
+    frames = arguments[0];
+    xMin = fm.icelink.webrtc.layoutPreset.getXMin(frames);
+    xMax = fm.icelink.webrtc.layoutPreset.getXMax(frames);
+    if (fm.global.equals(xMin, xMax)) {
+      return xMin;
+    }
+    num3 = fm.icelink.webrtc.layoutPreset.divideByTwo(xMin + xMax);
+    x = frames[0].getX();
+    num5 = fm.mathAssistant.abs(num3 - x);
+    i = 1;
+    while (i < frames.length) {
+      try {
+        frame = frames[i];
+        num7 = fm.mathAssistant.abs(num3 - frame.getX());
+        if (num7 < num5) {
+          x = frame.getX();
+          num5 = num7;
+        }
+      } finally {
+        i++;
+      }
+    }
+    return x;
+  };
+
+  layoutPreset.getXMin = function() {
+    var frame, frames, i, x;
+    frames = arguments[0];
+    if (fm.global.equals(frames.length, 0)) {
+      return frames[0].getX();
+    }
+    x = frames[0].getX();
+    i = 1;
+    while (i < frames.length) {
+      try {
+        frame = frames[i];
+        if (frame.getX() < x) {
+          x = frame.getX();
+        }
+      } finally {
+        i++;
+      }
+    }
+    return x;
+  };
+
+  layoutPreset.getYMax = function() {
+    var frame, frames, i, y;
+    frames = arguments[0];
+    if (fm.global.equals(frames.length, 0)) {
+      return frames[0].getY();
+    }
+    y = frames[0].getY();
+    i = 1;
+    while (i < frames.length) {
+      try {
+        frame = frames[i];
+        if (frame.getY() > y) {
+          y = frame.getY();
+        }
+      } finally {
+        i++;
+      }
+    }
+    return y;
+  };
+
+  layoutPreset.getYMid = function() {
+    var frame, frames, i, num3, num5, num7, y, yMax, yMin;
+    frames = arguments[0];
+    yMin = fm.icelink.webrtc.layoutPreset.getYMin(frames);
+    yMax = fm.icelink.webrtc.layoutPreset.getYMax(frames);
+    if (fm.global.equals(yMin, yMax)) {
+      return yMin;
+    }
+    num3 = fm.icelink.webrtc.layoutPreset.divideByTwo(yMin + yMax);
+    y = frames[0].getY();
+    num5 = fm.mathAssistant.abs(num3 - y);
+    i = 1;
+    while (i < frames.length) {
+      try {
+        frame = frames[i];
+        num7 = fm.mathAssistant.abs(num3 - frame.getY());
+        if (num7 < num5) {
+          y = frame.getY();
+          num5 = num7;
+        }
+      } finally {
+        i++;
+      }
+    }
+    return y;
+  };
+
+  layoutPreset.getYMin = function() {
+    var frame, frames, i, y;
+    frames = arguments[0];
+    if (fm.global.equals(frames.length, 0)) {
+      return frames[0].getY();
+    }
+    y = frames[0].getY();
+    i = 1;
+    while (i < frames.length) {
+      try {
+        frame = frames[i];
+        if (frame.getY() < y) {
+          y = frame.getY();
+        }
+      } finally {
+        i++;
+      }
+    }
+    return y;
+  };
+
+  layoutPreset.mergeLayoutFrames = function() {
+    var firstFrames, frameArray, lastFrames, length, num2, num3;
+    firstFrames = arguments[0];
+    lastFrames = arguments[1];
+    length = firstFrames.length;
+    num2 = lastFrames.length;
+    frameArray = new Array(length + num2);
+    num3 = 0;
+    while (num3 < length) {
+      try {
+        frameArray[num3] = firstFrames[num3];
+      } finally {
+        num3++;
+      }
+    }
+    num3 = 0;
+    while (num3 < num2) {
+      try {
+        frameArray[num3 + length] = lastFrames[num3];
+      } finally {
+        num3++;
+      }
+    }
+    return frameArray;
+  };
+
+  layoutPreset.spliceLayoutFrame = function() {
+    var frames, index, start;
+    frames = arguments[0];
+    index = arguments[1];
+    start = index + 1;
+    return fm.icelink.webrtc.layoutPreset.mergeLayoutFrames(fm.icelink.webrtc.layoutPreset.takeLayoutFrames(frames, 0, index), fm.icelink.webrtc.layoutPreset.takeLayoutFrames(frames, start, frames.length - start));
+  };
+
+  layoutPreset.takeLayoutFrames = function() {
+    var frameArray, frames, i, length, start;
+    frames = arguments[0];
+    start = arguments[1];
+    length = arguments[2];
+    frameArray = new Array(length);
+    i = 0;
+    while (i < frameArray.length) {
+      try {
+        frameArray[i] = frames[start + i];
+      } finally {
+        i++;
+      }
+    }
+    return frameArray;
+  };
+
+  layoutPreset.transformFrame = function() {
+    var flag, flag2, frame, layoutHeight, layoutWidth, origin;
+    frame = arguments[0];
+    origin = arguments[1];
+    layoutWidth = arguments[2];
+    layoutHeight = arguments[3];
+    flag = false;
+    flag2 = false;
+    switch (origin) {
+      case fm.icelink.webrtc.layoutOrigin.TopRight:
+        flag = true;
+        break;
+      case fm.icelink.webrtc.layoutOrigin.BottomRight:
+        flag = true;
+        flag2 = true;
+        break;
+      case fm.icelink.webrtc.layoutOrigin.BottomLeft:
+        flag2 = true;
+        break;
+    }
+    if (flag) {
+      frame.setX((layoutWidth - frame.getX()) - frame.getWidth());
+    }
+    if (flag2) {
+      return frame.setY((layoutHeight - frame.getY()) - frame.getHeight());
+    }
   };
 
 
@@ -3611,6 +3888,304 @@ fm.icelink.webrtc.layoutPreset = (function(superClass) {
     if (preset.getInlineMargin() > 0) {
       return this.setInlineMargin(preset.getInlineMargin());
     }
+  };
+
+  layoutPreset.prototype.calculateBlockFrame = function() {
+    var height, layoutHeight, layoutWidth, marginX, marginY, width, x, y;
+    layoutWidth = arguments[0];
+    layoutHeight = arguments[1];
+    marginX = arguments[2];
+    marginY = arguments[3];
+    if ((fm.global.equals(this.getBlockWidth(), 0)) && (fm.global.equals(this.getBlockWidthPercent(), 0))) {
+      this.setBlockWidthPercent(0.25);
+    }
+    if ((fm.global.equals(this.getBlockHeight(), 0)) && (fm.global.equals(this.getBlockHeightPercent(), 0))) {
+      this.setBlockHeightPercent(0.25);
+    }
+    width = (this.getBlockWidth() > 0 ? this.getBlockWidth() : layoutWidth * this.getBlockWidthPercent());
+    height = (this.getBlockHeight() > 0 ? this.getBlockHeight() : layoutHeight * this.getBlockHeightPercent());
+    marginX.setValue((this.getBlockMarginX() > 0 ? this.getBlockMarginX() : layoutWidth * this.getBlockMarginXPercent()));
+    marginY.setValue((this.getBlockMarginY() > 0 ? this.getBlockMarginY() : layoutHeight * this.getBlockMarginYPercent()));
+    x = 0;
+    switch (this.getAlignment()) {
+      case fm.icelink.webrtc.layoutAlignment.Top:
+      case fm.icelink.webrtc.layoutAlignment.Center:
+      case fm.icelink.webrtc.layoutAlignment.Bottom:
+        x = fm.icelink.webrtc.layoutPreset.divideByTwo(layoutWidth - width);
+        break;
+      case fm.icelink.webrtc.layoutAlignment.TopRight:
+      case fm.icelink.webrtc.layoutAlignment.Right:
+      case fm.icelink.webrtc.layoutAlignment.BottomRight:
+        x = layoutWidth - width;
+        break;
+      default:
+        x = 0;
+        break;
+    }
+    y = 0;
+    switch (this.getAlignment()) {
+      case fm.icelink.webrtc.layoutAlignment.Left:
+      case fm.icelink.webrtc.layoutAlignment.Center:
+      case fm.icelink.webrtc.layoutAlignment.Right:
+        y = fm.icelink.webrtc.layoutPreset.divideByTwo(layoutHeight - height);
+        break;
+      case fm.icelink.webrtc.layoutAlignment.BottomLeft:
+      case fm.icelink.webrtc.layoutAlignment.Bottom:
+      case fm.icelink.webrtc.layoutAlignment.BottomRight:
+        y = layoutHeight - height;
+        break;
+      default:
+        y = 0;
+        break;
+    }
+    return new fm.icelink.webrtc.layoutFrame(x, y, width, height);
+  };
+
+  layoutPreset.prototype.calculateFillFrame = function() {
+    var layoutHeight, layoutWidth;
+    layoutWidth = arguments[0];
+    layoutHeight = arguments[1];
+    return new fm.icelink.webrtc.layoutFrame(0, 0, layoutWidth, layoutHeight);
+  };
+
+  layoutPreset.prototype.calculateFloatFrame = function() {
+    var layoutHeight, layoutWidth;
+    layoutWidth = arguments[0];
+    layoutHeight = arguments[1];
+    return this.calculateFloatFrames(layoutWidth, layoutHeight, 1)[0];
+  };
+
+  layoutPreset.prototype.calculateFloatFrames = function() {
+    var _var0, _var1, _var2, _var3, _var4, _var5, count, frame, frameArray, j, k, l, layoutHeight, layoutWidth, len, len1, len2, len3, len4, len5, m, n, num, num2, num3, num4, o;
+    layoutWidth = arguments[0];
+    layoutHeight = arguments[1];
+    count = arguments[2];
+    if ((fm.global.equals(this.getFloatWidth(), 0)) && (fm.global.equals(this.getFloatWidthPercent(), 0))) {
+      this.setFloatWidthPercent(0.25);
+    }
+    if ((fm.global.equals(this.getFloatHeight(), 0)) && (fm.global.equals(this.getFloatHeightPercent(), 0))) {
+      this.setFloatHeightPercent(0.25);
+    }
+    num = (this.getFloatWidth() > 0 ? this.getFloatWidth() : layoutWidth * this.getFloatWidthPercent());
+    num2 = (this.getFloatHeight() > 0 ? this.getFloatHeight() : layoutHeight * this.getFloatHeightPercent());
+    num3 = (this.getFloatMarginX() > 0 ? this.getFloatMarginX() : layoutWidth * this.getFloatMarginXPercent());
+    num4 = (this.getFloatMarginY() > 0 ? this.getFloatMarginY() : layoutHeight * this.getFloatMarginYPercent());
+    if (fm.global.equals(this.getDirection(), fm.icelink.webrtc.layoutDirection.Horizontal)) {
+      num = fm.mathAssistant.min(layoutWidth, num * count);
+    } else {
+      num2 = fm.mathAssistant.min(layoutHeight, num2 * count);
+    }
+    frameArray = this.calculateInlineFrames(num, num2, count, 0, 0);
+    switch (this.getAlignment()) {
+      case fm.icelink.webrtc.layoutAlignment.TopLeft:
+      case fm.icelink.webrtc.layoutAlignment.Top:
+      case fm.icelink.webrtc.layoutAlignment.TopRight:
+        _var0 = frameArray;
+        for (j = 0, len = _var0.length; j < len; j++) {
+          frame = _var0[j];
+          frame.setY(frame.getY() + num4);
+        }
+        break;
+      case fm.icelink.webrtc.layoutAlignment.Left:
+      case fm.icelink.webrtc.layoutAlignment.Center:
+      case fm.icelink.webrtc.layoutAlignment.Right:
+        _var1 = frameArray;
+        for (k = 0, len1 = _var1.length; k < len1; k++) {
+          frame = _var1[k];
+          frame.setY(frame.getY() + fm.icelink.webrtc.layoutPreset.divideByTwo(layoutHeight - num2));
+        }
+        break;
+      case fm.icelink.webrtc.layoutAlignment.BottomLeft:
+      case fm.icelink.webrtc.layoutAlignment.Bottom:
+      case fm.icelink.webrtc.layoutAlignment.BottomRight:
+        _var2 = frameArray;
+        for (l = 0, len2 = _var2.length; l < len2; l++) {
+          frame = _var2[l];
+          frame.setY(frame.getY() + ((layoutHeight - num2) - num4));
+        }
+        break;
+    }
+    switch (this.getAlignment()) {
+      case fm.icelink.webrtc.layoutAlignment.TopLeft:
+      case fm.icelink.webrtc.layoutAlignment.Left:
+      case fm.icelink.webrtc.layoutAlignment.BottomLeft:
+        _var3 = frameArray;
+        for (m = 0, len3 = _var3.length; m < len3; m++) {
+          frame = _var3[m];
+          frame.setX(frame.getX() + num3);
+        }
+        return frameArray;
+      case fm.icelink.webrtc.layoutAlignment.Top:
+      case fm.icelink.webrtc.layoutAlignment.Center:
+      case fm.icelink.webrtc.layoutAlignment.Bottom:
+        _var4 = frameArray;
+        for (n = 0, len4 = _var4.length; n < len4; n++) {
+          frame = _var4[n];
+          frame.setX(frame.getX() + fm.icelink.webrtc.layoutPreset.divideByTwo(layoutWidth - num));
+        }
+        return frameArray;
+      case fm.icelink.webrtc.layoutAlignment.TopRight:
+      case fm.icelink.webrtc.layoutAlignment.Right:
+      case fm.icelink.webrtc.layoutAlignment.BottomRight:
+        _var5 = frameArray;
+        for (o = 0, len5 = _var5.length; o < len5; o++) {
+          frame = _var5[o];
+          frame.setX(frame.getX() + ((layoutWidth - num) - num3));
+        }
+        return frameArray;
+    }
+    return frameArray;
+  };
+
+  layoutPreset.prototype.calculateInlineFrame = function() {
+    var cellHeight, cellWidth, cellX, cellY, num, width, x, y;
+    cellX = arguments[0];
+    cellY = arguments[1];
+    cellWidth = arguments[2];
+    cellHeight = arguments[3];
+    num = fm.icelink.webrtc.layoutPreset.divideByTwo(this.getInlineMargin());
+    x = cellX - num;
+    y = cellY - num;
+    width = cellWidth - this.getInlineMargin();
+    return new fm.icelink.webrtc.layoutFrame(x, y, width, cellHeight - this.getInlineMargin());
+  };
+
+  layoutPreset.prototype.calculateInlineFrames = function() {
+    var baseX, baseY, cellHeight, cellWidth, columnCount, count, frame, layoutHeight, layoutWidth, list, num10, num11, num12, num13, num14, num15, num16, num17, num18, num5, num6, num7, num8, num9, rowCount, table;
+    layoutWidth = arguments[0];
+    layoutHeight = arguments[1];
+    count = arguments[2];
+    baseX = arguments[3];
+    baseY = arguments[4];
+    list = [];
+    table = fm.icelink.webrtc.layoutPreset.calculateTable(layoutWidth + this.getInlineMargin(), layoutHeight + this.getInlineMargin(), count);
+    columnCount = table.getColumnCount();
+    rowCount = table.getRowCount();
+    cellWidth = table.getCellWidth();
+    cellHeight = table.getCellHeight();
+    num5 = fm.icelink.webrtc.layoutPreset.divideByTwo(this.getInlineMargin());
+    if (fm.global.equals(this.getDirection(), fm.icelink.webrtc.layoutDirection.Horizontal)) {
+      num6 = 0;
+      num7 = baseY + num5;
+      num8 = (layoutHeight - (rowCount * cellHeight)) + this.getInlineMargin();
+      num9 = 0;
+      while (num9 < rowCount) {
+        num10 = (num9 < num8 ? 1 : 0);
+        num11 = columnCount;
+        if (fm.global.equals(num9, rowCount - 1)) {
+          num11 = count - num6;
+        }
+        num12 = baseX + num5;
+        if ((fm.global.equals(num9, rowCount - 1)) && (rowCount > 1)) {
+          num13 = num12 - num5;
+          num14 = num7 - num5;
+          fm.arrayExtensions.addRange(list, this.calculateInlineFrames(baseX + layoutWidth, (baseY + layoutHeight) - num14, num11, num13, num14));
+        } else {
+          num15 = (layoutWidth - (num11 * cellWidth)) + this.getInlineMargin();
+          num16 = 0;
+          while (num16 < num11) {
+            num17 = (num16 < num15 ? 1 : 0);
+            frame = this.calculateInlineFrame(num12, num7, cellWidth + num17, cellHeight + num10);
+            fm.arrayExtensions.add(list, frame);
+            num12 = num12 + (cellWidth + num17);
+            num16++;
+            num6++;
+          }
+        }
+        num7 = num7 + (cellHeight + num10);
+        num9++;
+      }
+    } else {
+      num6 = 0;
+      num12 = baseX + num5;
+      num15 = (layoutWidth - (columnCount * cellWidth)) + this.getInlineMargin();
+      num16 = 0;
+      while (num16 < columnCount) {
+        try {
+          num17 = (num16 < num15 ? 1 : 0);
+          num18 = rowCount;
+          if (fm.global.equals(num16, columnCount - 1)) {
+            num18 = count - num6;
+          }
+          num7 = baseY + num5;
+          if ((fm.global.equals(num16, columnCount - 1)) && (columnCount > 1)) {
+            num13 = num12 - num5;
+            num14 = num7 - num5;
+            fm.arrayExtensions.addRange(list, this.calculateInlineFrames((baseX + layoutWidth) - num13, baseY + layoutHeight, num18, num13, num14));
+          } else {
+            num8 = (layoutHeight - (num18 * cellHeight)) + this.getInlineMargin();
+            num9 = 0;
+            while (num9 < num18) {
+              num10 = (num9 < num8 ? 1 : 0);
+              frame = this.calculateInlineFrame(num12, num7, cellWidth + num17, cellHeight + num10);
+              fm.arrayExtensions.add(list, frame);
+              num7 = num7 + (cellHeight + num10);
+              num9++;
+              num6++;
+            }
+          }
+          num12 = num12 + (cellWidth + num17);
+        } finally {
+          num16++;
+        }
+      }
+    }
+    return fm.arrayExtensions.toArray(list);
+  };
+
+
+  /*<span id='method-fm.icelink.webrtc.layoutPreset-calculateLayout'>&nbsp;</span> */
+
+
+  /**
+  	 <div>
+  	 Gets a video frame layout.
+  	 </div>
+  	@function calculateLayout
+  	@param {Integer} layoutWidth The total width of the layout.
+  	@param {Integer} layoutHeight The total height of the layout.
+  	@param {Integer} remoteCount The number of remote frames.
+  	@param {fm.icelink.webrtc.layoutOrigin} origin The layout origin
+  	@return {fm.icelink.webrtc.layout} The video frame layout.
+   */
+
+  layoutPreset.prototype.calculateLayout = function() {
+    var _var0, frame, j, layoutHeight, layoutWidth, len, origin, remoteCount, singleLayout;
+    layoutWidth = arguments[0];
+    layoutHeight = arguments[1];
+    remoteCount = arguments[2];
+    origin = arguments[3];
+    if (layoutWidth < 0) {
+      layoutWidth = 0;
+    }
+    if (layoutHeight < 0) {
+      layoutHeight = 0;
+    }
+    singleLayout = new fm.icelink.webrtc.layout();
+    if (fm.global.equals(remoteCount, 0)) {
+      singleLayout = fm.icelink.webrtc.layoutPreset.getSingleLayout(layoutWidth, layoutHeight);
+    } else {
+      if (fm.global.equals(this.getMode(), fm.icelink.webrtc.layoutMode.FloatLocal)) {
+        singleLayout = this.getFloatLocalLayout(layoutWidth, layoutHeight, remoteCount);
+      } else {
+        if (fm.global.equals(this.getMode(), fm.icelink.webrtc.layoutMode.FloatRemote)) {
+          singleLayout = this.getFloatRemoteLayout(layoutWidth, layoutHeight, remoteCount);
+        } else {
+          if (fm.global.equals(this.getMode(), fm.icelink.webrtc.layoutMode.Block)) {
+            singleLayout = this.getBlockLayout(layoutWidth, layoutHeight, remoteCount);
+          } else {
+            singleLayout = this.getInlineLayout(layoutWidth, layoutHeight, remoteCount);
+          }
+        }
+      }
+    }
+    fm.icelink.webrtc.layoutPreset.transformFrame(singleLayout.getLocalFrame(), origin, layoutWidth, layoutHeight);
+    _var0 = singleLayout.getRemoteFrames();
+    for (j = 0, len = _var0.length; j < len; j++) {
+      frame = _var0[j];
+      fm.icelink.webrtc.layoutPreset.transformFrame(frame, origin, layoutWidth, layoutHeight);
+    }
+    return singleLayout;
   };
 
 
@@ -3757,6 +4332,82 @@ fm.icelink.webrtc.layoutPreset = (function(superClass) {
     return this.__blockHeightPercent;
   };
 
+  layoutPreset.prototype.getBlockLayout = function() {
+    var _var0, _var1, _var2, baseX, baseY, count, frame, layout, layoutHeight, layoutWidth, list, marginX, marginY, num10, num4, num7, num8, num9, remoteCount;
+    layoutWidth = arguments[0];
+    layoutHeight = arguments[1];
+    remoteCount = arguments[2];
+    marginX = 0;
+    marginY = 0;
+    _var0 = new fm.holder(marginX);
+    _var1 = new fm.holder(marginY);
+    _var2 = this.calculateBlockFrame(layoutWidth, layoutHeight, _var0, _var1);
+    marginX = _var0.getValue();
+    marginY = _var1.getValue();
+    frame = _var2;
+    list = [];
+    if (fm.global.equals(this.getAlignment(), fm.icelink.webrtc.layoutAlignment.Center)) {
+      count = fm.icelink.webrtc.layoutPreset.divideByTwo(remoteCount);
+      num4 = remoteCount - count;
+      baseX = 0;
+      baseY = 0;
+      if (fm.global.equals(this.getDirection(), fm.icelink.webrtc.layoutDirection.Vertical)) {
+        num7 = (frame.getWidth() + marginX) + marginX;
+        layoutWidth = fm.icelink.webrtc.layoutPreset.divideByTwo(layoutWidth - num7);
+        baseX = layoutWidth + num7;
+      } else {
+        num8 = (frame.getHeight() + marginY) + marginY;
+        layoutHeight = fm.icelink.webrtc.layoutPreset.divideByTwo(layoutHeight - num8);
+        baseY = layoutHeight + num8;
+      }
+      if (count > 0) {
+        fm.arrayExtensions.addRange(list, this.calculateInlineFrames(layoutWidth, layoutHeight, count, 0, 0));
+      }
+      if (num4 > 0) {
+        fm.arrayExtensions.addRange(list, this.calculateInlineFrames(layoutWidth, layoutHeight, num4, baseX, baseY));
+      }
+    } else {
+      num9 = 0;
+      num10 = 0;
+      num7 = frame.getWidth() + marginX;
+      num8 = frame.getHeight() + marginY;
+      if (fm.global.equals(this.getAlignment(), fm.icelink.webrtc.layoutAlignment.Top)) {
+        num10 = num8;
+        layoutHeight = layoutHeight - num8;
+      } else {
+        if (fm.global.equals(this.getAlignment(), fm.icelink.webrtc.layoutAlignment.Bottom)) {
+          layoutHeight = layoutHeight - num8;
+        } else {
+          if (fm.global.equals(this.getAlignment(), fm.icelink.webrtc.layoutAlignment.Left)) {
+            num9 = num7;
+            layoutWidth = layoutWidth - num7;
+          } else {
+            if (fm.global.equals(this.getAlignment(), fm.icelink.webrtc.layoutAlignment.Right)) {
+              layoutWidth = layoutWidth - num7;
+            } else {
+              if (fm.global.equals(this.getDirection(), fm.icelink.webrtc.layoutDirection.Vertical)) {
+                if ((fm.global.equals(this.getAlignment(), fm.icelink.webrtc.layoutAlignment.TopLeft)) || (fm.global.equals(this.getAlignment(), fm.icelink.webrtc.layoutAlignment.BottomLeft))) {
+                  num9 = num7;
+                }
+                layoutWidth = layoutWidth - num7;
+              } else {
+                if ((fm.global.equals(this.getAlignment(), fm.icelink.webrtc.layoutAlignment.TopLeft)) || (fm.global.equals(this.getAlignment(), fm.icelink.webrtc.layoutAlignment.TopRight))) {
+                  num10 = num8;
+                }
+                layoutHeight = layoutHeight - num8;
+              }
+            }
+          }
+        }
+      }
+      fm.arrayExtensions.addRange(list, this.calculateInlineFrames(layoutWidth, layoutHeight, remoteCount, num9, num10));
+    }
+    layout = new fm.icelink.webrtc.layout();
+    layout.setLocalFrame(frame);
+    layout.setRemoteFrames(fm.arrayExtensions.toArray(list));
+    return layout;
+  };
+
 
   /*<span id='method-fm.icelink.webrtc.layoutPreset-getBlockMarginX'>&nbsp;</span> */
 
@@ -3870,6 +4521,36 @@ fm.icelink.webrtc.layoutPreset = (function(superClass) {
     return this.__blockWidthPercent;
   };
 
+  layoutPreset.prototype.getBottomRowIndexes = function() {
+    var frames, num2, num3, num4, numArray, yMax;
+    frames = arguments[0];
+    yMax = fm.icelink.webrtc.layoutPreset.getYMax(frames);
+    num2 = 0;
+    num3 = 0;
+    while (num3 < frames.length) {
+      try {
+        if (fm.global.equals(frames[num3].getY(), yMax)) {
+          num2++;
+        }
+      } finally {
+        num3++;
+      }
+    }
+    num4 = 0;
+    numArray = new Array(num2);
+    num3 = 0;
+    while (num3 < frames.length) {
+      try {
+        if (fm.global.equals(frames[num3].getY(), yMax)) {
+          numArray[num4++] = num3;
+        }
+      } finally {
+        num3++;
+      }
+    }
+    return numArray;
+  };
+
 
   /*<span id='method-fm.icelink.webrtc.layoutPreset-getCellMargin'>&nbsp;</span> */
 
@@ -3888,6 +4569,66 @@ fm.icelink.webrtc.layoutPreset = (function(superClass) {
 
   layoutPreset.prototype.getCellMargin = function() {
     return this.getInlineMargin();
+  };
+
+  layoutPreset.prototype.getCenterColumnIndexes = function() {
+    var frames, num2, num3, num4, numArray, xMid;
+    frames = arguments[0];
+    xMid = fm.icelink.webrtc.layoutPreset.getXMid(frames);
+    num2 = 0;
+    num3 = 0;
+    while (num3 < frames.length) {
+      try {
+        if (fm.global.equals(frames[num3].getX(), xMid)) {
+          num2++;
+        }
+      } finally {
+        num3++;
+      }
+    }
+    num4 = 0;
+    numArray = new Array(num2);
+    num3 = 0;
+    while (num3 < frames.length) {
+      try {
+        if (fm.global.equals(frames[num3].getX(), xMid)) {
+          numArray[num4++] = num3;
+        }
+      } finally {
+        num3++;
+      }
+    }
+    return numArray;
+  };
+
+  layoutPreset.prototype.getCenterRowIndexes = function() {
+    var frames, num2, num3, num4, numArray, yMid;
+    frames = arguments[0];
+    yMid = fm.icelink.webrtc.layoutPreset.getYMid(frames);
+    num2 = 0;
+    num3 = 0;
+    while (num3 < frames.length) {
+      try {
+        if (fm.global.equals(frames[num3].getY(), yMid)) {
+          num2++;
+        }
+      } finally {
+        num3++;
+      }
+    }
+    num4 = 0;
+    numArray = new Array(num2);
+    num3 = 0;
+    while (num3 < frames.length) {
+      try {
+        if (fm.global.equals(frames[num3].getY(), yMid)) {
+          numArray[num4++] = num3;
+        }
+      } finally {
+        num3++;
+      }
+    }
+    return numArray;
   };
 
 
@@ -3943,6 +4684,17 @@ fm.icelink.webrtc.layoutPreset = (function(superClass) {
 
   layoutPreset.prototype.getFloatHeightPercent = function() {
     return this.__floatHeightPercent;
+  };
+
+  layoutPreset.prototype.getFloatLocalLayout = function() {
+    var layout, layoutHeight, layoutWidth, remoteCount;
+    layoutWidth = arguments[0];
+    layoutHeight = arguments[1];
+    remoteCount = arguments[2];
+    layout = new fm.icelink.webrtc.layout();
+    layout.setLocalFrame(this.calculateFloatFrame(layoutWidth, layoutHeight));
+    layout.setRemoteFrames(this.calculateInlineFrames(layoutWidth, layoutHeight, remoteCount, 0, 0));
+    return layout;
   };
 
 
@@ -4021,6 +4773,17 @@ fm.icelink.webrtc.layoutPreset = (function(superClass) {
     return this.__floatMarginYPercent;
   };
 
+  layoutPreset.prototype.getFloatRemoteLayout = function() {
+    var layout, layoutHeight, layoutWidth, remoteCount;
+    layoutWidth = arguments[0];
+    layoutHeight = arguments[1];
+    remoteCount = arguments[2];
+    layout = new fm.icelink.webrtc.layout();
+    layout.setLocalFrame(this.calculateFillFrame(layoutWidth, layoutHeight));
+    layout.setRemoteFrames(this.calculateFloatFrames(layoutWidth, layoutHeight, remoteCount));
+    return layout;
+  };
+
 
   /*<span id='method-fm.icelink.webrtc.layoutPreset-getFloatWidth'>&nbsp;</span> */
 
@@ -4058,6 +4821,74 @@ fm.icelink.webrtc.layoutPreset = (function(superClass) {
     return this.__floatWidthPercent;
   };
 
+  layoutPreset.prototype.getInlineLayout = function() {
+    var centerRowIndexes, frames, index, layout, layoutHeight, layoutWidth, leftColumnIndexes, remoteCount, topRowIndexes;
+    layoutWidth = arguments[0];
+    layoutHeight = arguments[1];
+    remoteCount = arguments[2];
+    frames = this.calculateInlineFrames(layoutWidth, layoutHeight, remoteCount + 1, 0, 0);
+    index = 0;
+    if (fm.global.equals(this.getAlignment(), fm.icelink.webrtc.layoutAlignment.TopLeft)) {
+      index = 0;
+    } else {
+      if (fm.global.equals(this.getAlignment(), fm.icelink.webrtc.layoutAlignment.Top)) {
+        topRowIndexes = this.getTopRowIndexes(frames);
+        index = topRowIndexes[fm.icelink.webrtc.layoutPreset.divideByTwo(topRowIndexes.length)];
+      } else {
+        if (fm.global.equals(this.getAlignment(), fm.icelink.webrtc.layoutAlignment.TopRight)) {
+          if (fm.global.equals(this.getDirection(), fm.icelink.webrtc.layoutDirection.Horizontal)) {
+            centerRowIndexes = this.getTopRowIndexes(frames);
+            index = centerRowIndexes[centerRowIndexes.length - 1];
+          } else {
+            index = this.getRightColumnIndexes(frames)[0];
+          }
+        } else {
+          if (fm.global.equals(this.getAlignment(), fm.icelink.webrtc.layoutAlignment.Left)) {
+            leftColumnIndexes = this.getLeftColumnIndexes(frames);
+            index = leftColumnIndexes[fm.icelink.webrtc.layoutPreset.divideByTwo(leftColumnIndexes.length)];
+          } else {
+            if (fm.global.equals(this.getAlignment(), fm.icelink.webrtc.layoutAlignment.Center)) {
+              if (fm.global.equals(this.getDirection(), fm.icelink.webrtc.layoutDirection.Horizontal)) {
+                centerRowIndexes = this.getCenterRowIndexes(frames);
+                index = centerRowIndexes[fm.icelink.webrtc.layoutPreset.divideByTwo(centerRowIndexes.length)];
+              } else {
+                leftColumnIndexes = this.getCenterColumnIndexes(frames);
+                index = leftColumnIndexes[fm.icelink.webrtc.layoutPreset.divideByTwo(leftColumnIndexes.length)];
+              }
+            } else {
+              if (fm.global.equals(this.getAlignment(), fm.icelink.webrtc.layoutAlignment.Right)) {
+                leftColumnIndexes = this.getRightColumnIndexes(frames);
+                index = leftColumnIndexes[fm.icelink.webrtc.layoutPreset.divideByTwo(leftColumnIndexes.length)];
+              } else {
+                if (fm.global.equals(this.getAlignment(), fm.icelink.webrtc.layoutAlignment.BottomLeft)) {
+                  if (fm.global.equals(this.getDirection(), fm.icelink.webrtc.layoutDirection.Horizontal)) {
+                    index = this.getBottomRowIndexes(frames)[0];
+                  } else {
+                    leftColumnIndexes = this.getLeftColumnIndexes(frames);
+                    index = leftColumnIndexes[leftColumnIndexes.length - 1];
+                  }
+                } else {
+                  if (fm.global.equals(this.getAlignment(), fm.icelink.webrtc.layoutAlignment.Bottom)) {
+                    centerRowIndexes = this.getBottomRowIndexes(frames);
+                    index = centerRowIndexes[fm.icelink.webrtc.layoutPreset.divideByTwo(centerRowIndexes.length)];
+                  } else {
+                    if (fm.global.equals(this.getAlignment(), fm.icelink.webrtc.layoutAlignment.BottomRight)) {
+                      index = frames.length - 1;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    layout = new fm.icelink.webrtc.layout();
+    layout.setLocalFrame(frames[index]);
+    layout.setRemoteFrames(fm.icelink.webrtc.layoutPreset.spliceLayoutFrame(frames, index));
+    return layout;
+  };
+
 
   /*<span id='method-fm.icelink.webrtc.layoutPreset-getInlineMargin'>&nbsp;</span> */
 
@@ -4074,6 +4905,36 @@ fm.icelink.webrtc.layoutPreset = (function(superClass) {
 
   layoutPreset.prototype.getInlineMargin = function() {
     return this._inlineMargin;
+  };
+
+  layoutPreset.prototype.getLeftColumnIndexes = function() {
+    var frames, num2, num3, num4, numArray, xMin;
+    frames = arguments[0];
+    xMin = fm.icelink.webrtc.layoutPreset.getXMin(frames);
+    num2 = 0;
+    num3 = 0;
+    while (num3 < frames.length) {
+      try {
+        if (fm.global.equals(frames[num3].getX(), xMin)) {
+          num2++;
+        }
+      } finally {
+        num3++;
+      }
+    }
+    num4 = 0;
+    numArray = new Array(num2);
+    num3 = 0;
+    while (num3 < frames.length) {
+      try {
+        if (fm.global.equals(frames[num3].getX(), xMin)) {
+          numArray[num4++] = num3;
+        }
+      } finally {
+        num3++;
+      }
+    }
+    return numArray;
   };
 
 
@@ -4185,6 +5046,66 @@ fm.icelink.webrtc.layoutPreset = (function(superClass) {
 
   layoutPreset.prototype.getPreviewSize = function() {
     return this.getFloatWidthPercent();
+  };
+
+  layoutPreset.prototype.getRightColumnIndexes = function() {
+    var frames, num2, num3, num4, numArray, xMax;
+    frames = arguments[0];
+    xMax = fm.icelink.webrtc.layoutPreset.getXMax(frames);
+    num2 = 0;
+    num3 = 0;
+    while (num3 < frames.length) {
+      try {
+        if (fm.global.equals(frames[num3].getX(), xMax)) {
+          num2++;
+        }
+      } finally {
+        num3++;
+      }
+    }
+    num4 = 0;
+    numArray = new Array(num2);
+    num3 = 0;
+    while (num3 < frames.length) {
+      try {
+        if (fm.global.equals(frames[num3].getX(), xMax)) {
+          numArray[num4++] = num3;
+        }
+      } finally {
+        num3++;
+      }
+    }
+    return numArray;
+  };
+
+  layoutPreset.prototype.getTopRowIndexes = function() {
+    var frames, num2, num3, num4, numArray, yMin;
+    frames = arguments[0];
+    yMin = fm.icelink.webrtc.layoutPreset.getYMin(frames);
+    num2 = 0;
+    num3 = 0;
+    while (num3 < frames.length) {
+      try {
+        if (fm.global.equals(frames[num3].getY(), yMin)) {
+          num2++;
+        }
+      } finally {
+        num3++;
+      }
+    }
+    num4 = 0;
+    numArray = new Array(num2);
+    num3 = 0;
+    while (num3 < frames.length) {
+      try {
+        if (fm.global.equals(frames[num3].getY(), yMin)) {
+          numArray[num4++] = num3;
+        }
+      } finally {
+        num3++;
+      }
+    }
+    return numArray;
   };
 
 
@@ -5359,8 +6280,6 @@ fm.icelink.webrtc.baseLayoutManager = (function(superClass) {
     this.removeOnUnhandledException = bind(this.removeOnUnhandledException, this);
     this.removeFromContainer = bind(this.removeFromContainer, this);
     this.raiseUnhandledException = bind(this.raiseUnhandledException, this);
-    this.getTopRowIndexes = bind(this.getTopRowIndexes, this);
-    this.getRightColumnIndexes = bind(this.getRightColumnIndexes, this);
     this.getRemoteVideoControlsInternal = bind(this.getRemoteVideoControlsInternal, this);
     this.getRemoteVideoControls = bind(this.getRemoteVideoControls, this);
     this.getRemoteVideoControl = bind(this.getRemoteVideoControl, this);
@@ -5370,23 +6289,9 @@ fm.icelink.webrtc.baseLayoutManager = (function(superClass) {
     this.getOldestRemoteVideoControl = bind(this.getOldestRemoteVideoControl, this);
     this.getNewestRemoteVideoControl = bind(this.getNewestRemoteVideoControl, this);
     this.getLocalVideoControl = bind(this.getLocalVideoControl, this);
-    this.getLeftColumnIndexes = bind(this.getLeftColumnIndexes, this);
     this.getLayoutOrigin = bind(this.getLayoutOrigin, this);
     this.getLayout = bind(this.getLayout, this);
-    this.getInlineLayout = bind(this.getInlineLayout, this);
-    this.getFloatRemoteLayout = bind(this.getFloatRemoteLayout, this);
-    this.getFloatLocalLayout = bind(this.getFloatLocalLayout, this);
-    this.getCenterRowIndexes = bind(this.getCenterRowIndexes, this);
-    this.getCenterColumnIndexes = bind(this.getCenterColumnIndexes, this);
-    this.getBottomRowIndexes = bind(this.getBottomRowIndexes, this);
-    this.getBlockLayout = bind(this.getBlockLayout, this);
     this.doLayout = bind(this.doLayout, this);
-    this.calculateInlineFrames = bind(this.calculateInlineFrames, this);
-    this.calculateInlineFrame = bind(this.calculateInlineFrame, this);
-    this.calculateFloatFrames = bind(this.calculateFloatFrames, this);
-    this.calculateFloatFrame = bind(this.calculateFloatFrame, this);
-    this.calculateFillFrame = bind(this.calculateFillFrame, this);
-    this.calculateBlockFrame = bind(this.calculateBlockFrame, this);
     this.applyLayout = bind(this.applyLayout, this);
     this.addToContainer = bind(this.addToContainer, this);
     this.addRemoteVideoControlUI = bind(this.addRemoteVideoControlUI, this);
@@ -5398,10 +6303,6 @@ fm.icelink.webrtc.baseLayoutManager = (function(superClass) {
     if (arguments.length === 1 && fm.util.isPlainObject(arguments[0])) {
       baseLayoutManager.call(this, null);
       fm.util.attachProperties(this, arguments[0]);
-      return instance;
-    }
-    if (arguments.length === 0) {
-      baseLayoutManager.call(this, null);
       return instance;
     }
     if (arguments.length === 1) {
@@ -5417,267 +6318,11 @@ fm.icelink.webrtc.baseLayoutManager = (function(superClass) {
       this.setLayoutOrigin(fm.icelink.webrtc.layoutOrigin.TopLeft);
       return instance;
     }
+    if (arguments.length === 0) {
+      baseLayoutManager.call(this, null);
+      return instance;
+    }
   }
-
-  baseLayoutManager.calculateTable = function() {
-    var cellWidth, count, i, num, num2, num3, num5, num6, num7, num8, tableHeight, tableWidth;
-    tableWidth = arguments[0];
-    tableHeight = arguments[1];
-    count = arguments[2];
-    num = 0;
-    num2 = 1;
-    num3 = 1;
-    i = count;
-    while (i >= 1) {
-      try {
-        num5 = fm.mathAssistant.ceil(count / i);
-        num6 = tableWidth / i;
-        num7 = tableHeight / num5;
-        num8 = (num6 < num7 ? num6 : num7);
-        if (num8 >= num) {
-          num = num8;
-          num2 = i;
-          num3 = num5;
-        }
-      } finally {
-        i--;
-      }
-    }
-    cellWidth = fm.mathAssistant.floor(tableWidth / num2);
-    return new fm.icelink.webrtc.layoutTable(num2, num3, cellWidth, fm.mathAssistant.floor(tableHeight / num3));
-  };
-
-  baseLayoutManager.divideByTwo = function() {
-    var value;
-    value = arguments[0];
-    return fm.mathAssistant.floor(value / 2);
-  };
-
-  baseLayoutManager.getSingleLayout = function() {
-    var layout, layoutHeight, layoutWidth;
-    layoutWidth = arguments[0];
-    layoutHeight = arguments[1];
-    layout = new fm.icelink.webrtc.layout();
-    layout.setLocalFrame(new fm.icelink.webrtc.layoutFrame(0, 0, layoutWidth, layoutHeight));
-    return layout;
-  };
-
-  baseLayoutManager.getXMax = function() {
-    var frame, frames, i, x;
-    frames = arguments[0];
-    if (fm.global.equals(frames.length, 0)) {
-      return frames[0].getX();
-    }
-    x = frames[0].getX();
-    i = 1;
-    while (i < frames.length) {
-      try {
-        frame = frames[i];
-        if (frame.getX() > x) {
-          x = frame.getX();
-        }
-      } finally {
-        i++;
-      }
-    }
-    return x;
-  };
-
-  baseLayoutManager.getXMid = function() {
-    var frame, frames, i, num3, num5, num7, x, xMax, xMin;
-    frames = arguments[0];
-    xMin = fm.icelink.webrtc.baseLayoutManager.getXMin(frames);
-    xMax = fm.icelink.webrtc.baseLayoutManager.getXMax(frames);
-    if (fm.global.equals(xMin, xMax)) {
-      return xMin;
-    }
-    num3 = fm.icelink.webrtc.baseLayoutManager.divideByTwo(xMin + xMax);
-    x = frames[0].getX();
-    num5 = fm.mathAssistant.abs(num3 - x);
-    i = 1;
-    while (i < frames.length) {
-      try {
-        frame = frames[i];
-        num7 = fm.mathAssistant.abs(num3 - frame.getX());
-        if (num7 < num5) {
-          x = frame.getX();
-          num5 = num7;
-        }
-      } finally {
-        i++;
-      }
-    }
-    return x;
-  };
-
-  baseLayoutManager.getXMin = function() {
-    var frame, frames, i, x;
-    frames = arguments[0];
-    if (fm.global.equals(frames.length, 0)) {
-      return frames[0].getX();
-    }
-    x = frames[0].getX();
-    i = 1;
-    while (i < frames.length) {
-      try {
-        frame = frames[i];
-        if (frame.getX() < x) {
-          x = frame.getX();
-        }
-      } finally {
-        i++;
-      }
-    }
-    return x;
-  };
-
-  baseLayoutManager.getYMax = function() {
-    var frame, frames, i, y;
-    frames = arguments[0];
-    if (fm.global.equals(frames.length, 0)) {
-      return frames[0].getY();
-    }
-    y = frames[0].getY();
-    i = 1;
-    while (i < frames.length) {
-      try {
-        frame = frames[i];
-        if (frame.getY() > y) {
-          y = frame.getY();
-        }
-      } finally {
-        i++;
-      }
-    }
-    return y;
-  };
-
-  baseLayoutManager.getYMid = function() {
-    var frame, frames, i, num3, num5, num7, y, yMax, yMin;
-    frames = arguments[0];
-    yMin = fm.icelink.webrtc.baseLayoutManager.getYMin(frames);
-    yMax = fm.icelink.webrtc.baseLayoutManager.getYMax(frames);
-    if (fm.global.equals(yMin, yMax)) {
-      return yMin;
-    }
-    num3 = fm.icelink.webrtc.baseLayoutManager.divideByTwo(yMin + yMax);
-    y = frames[0].getY();
-    num5 = fm.mathAssistant.abs(num3 - y);
-    i = 1;
-    while (i < frames.length) {
-      try {
-        frame = frames[i];
-        num7 = fm.mathAssistant.abs(num3 - frame.getY());
-        if (num7 < num5) {
-          y = frame.getY();
-          num5 = num7;
-        }
-      } finally {
-        i++;
-      }
-    }
-    return y;
-  };
-
-  baseLayoutManager.getYMin = function() {
-    var frame, frames, i, y;
-    frames = arguments[0];
-    if (fm.global.equals(frames.length, 0)) {
-      return frames[0].getY();
-    }
-    y = frames[0].getY();
-    i = 1;
-    while (i < frames.length) {
-      try {
-        frame = frames[i];
-        if (frame.getY() < y) {
-          y = frame.getY();
-        }
-      } finally {
-        i++;
-      }
-    }
-    return y;
-  };
-
-  baseLayoutManager.mergeLayoutFrames = function() {
-    var firstFrames, frameArray, lastFrames, length, num2, num3;
-    firstFrames = arguments[0];
-    lastFrames = arguments[1];
-    length = firstFrames.length;
-    num2 = lastFrames.length;
-    frameArray = new Array(length + num2);
-    num3 = 0;
-    while (num3 < length) {
-      try {
-        frameArray[num3] = firstFrames[num3];
-      } finally {
-        num3++;
-      }
-    }
-    num3 = 0;
-    while (num3 < num2) {
-      try {
-        frameArray[num3 + length] = lastFrames[num3];
-      } finally {
-        num3++;
-      }
-    }
-    return frameArray;
-  };
-
-  baseLayoutManager.spliceLayoutFrame = function() {
-    var frames, index, start;
-    frames = arguments[0];
-    index = arguments[1];
-    start = index + 1;
-    return fm.icelink.webrtc.baseLayoutManager.mergeLayoutFrames(fm.icelink.webrtc.baseLayoutManager.takeLayoutFrames(frames, 0, index), fm.icelink.webrtc.baseLayoutManager.takeLayoutFrames(frames, start, frames.length - start));
-  };
-
-  baseLayoutManager.takeLayoutFrames = function() {
-    var frameArray, frames, i, length, start;
-    frames = arguments[0];
-    start = arguments[1];
-    length = arguments[2];
-    frameArray = new Array(length);
-    i = 0;
-    while (i < frameArray.length) {
-      try {
-        frameArray[i] = frames[start + i];
-      } finally {
-        i++;
-      }
-    }
-    return frameArray;
-  };
-
-  baseLayoutManager.transformFrame = function() {
-    var flag, flag2, frame, layoutHeight, layoutWidth, origin;
-    frame = arguments[0];
-    origin = arguments[1];
-    layoutWidth = arguments[2];
-    layoutHeight = arguments[3];
-    flag = false;
-    flag2 = false;
-    switch (origin) {
-      case fm.icelink.webrtc.layoutOrigin.TopRight:
-        flag = true;
-        break;
-      case fm.icelink.webrtc.layoutOrigin.BottomRight:
-        flag = true;
-        flag2 = true;
-        break;
-      case fm.icelink.webrtc.layoutOrigin.BottomLeft:
-        flag2 = true;
-        break;
-    }
-    if (flag) {
-      frame.setX((layoutWidth - frame.getX()) - frame.getWidth());
-    }
-    if (flag2) {
-      return frame.setY((layoutHeight - frame.getY()) - frame.getHeight());
-    }
-  };
 
 
   /*<span id='method-fm.icelink.webrtc.baseLayoutManager-addOnUnhandledException'>&nbsp;</span> */
@@ -5848,249 +6493,6 @@ fm.icelink.webrtc.baseLayoutManager = (function(superClass) {
 
   baseLayoutManager.prototype.applyLayout = function() {};
 
-  baseLayoutManager.prototype.calculateBlockFrame = function() {
-    var height, layoutHeight, layoutWidth, marginX, marginY, width, x, y;
-    layoutWidth = arguments[0];
-    layoutHeight = arguments[1];
-    marginX = arguments[2];
-    marginY = arguments[3];
-    if ((fm.global.equals(this.getBlockWidth(), 0)) && (fm.global.equals(this.getBlockWidthPercent(), 0))) {
-      this.setBlockWidthPercent(0.25);
-    }
-    if ((fm.global.equals(this.getBlockHeight(), 0)) && (fm.global.equals(this.getBlockHeightPercent(), 0))) {
-      this.setBlockHeightPercent(0.25);
-    }
-    width = (this.getBlockWidth() > 0 ? this.getBlockWidth() : layoutWidth * this.getBlockWidthPercent());
-    height = (this.getBlockHeight() > 0 ? this.getBlockHeight() : layoutHeight * this.getBlockHeightPercent());
-    marginX.setValue((this.getBlockMarginX() > 0 ? this.getBlockMarginX() : layoutWidth * this.getBlockMarginXPercent()));
-    marginY.setValue((this.getBlockMarginY() > 0 ? this.getBlockMarginY() : layoutHeight * this.getBlockMarginYPercent()));
-    x = 0;
-    switch (this.getAlignment()) {
-      case fm.icelink.webrtc.layoutAlignment.Top:
-      case fm.icelink.webrtc.layoutAlignment.Center:
-      case fm.icelink.webrtc.layoutAlignment.Bottom:
-        x = fm.icelink.webrtc.baseLayoutManager.divideByTwo(layoutWidth - width);
-        break;
-      case fm.icelink.webrtc.layoutAlignment.TopRight:
-      case fm.icelink.webrtc.layoutAlignment.Right:
-      case fm.icelink.webrtc.layoutAlignment.BottomRight:
-        x = layoutWidth - width;
-        break;
-      default:
-        x = 0;
-        break;
-    }
-    y = 0;
-    switch (this.getAlignment()) {
-      case fm.icelink.webrtc.layoutAlignment.Left:
-      case fm.icelink.webrtc.layoutAlignment.Center:
-      case fm.icelink.webrtc.layoutAlignment.Right:
-        y = fm.icelink.webrtc.baseLayoutManager.divideByTwo(layoutHeight - height);
-        break;
-      case fm.icelink.webrtc.layoutAlignment.BottomLeft:
-      case fm.icelink.webrtc.layoutAlignment.Bottom:
-      case fm.icelink.webrtc.layoutAlignment.BottomRight:
-        y = layoutHeight - height;
-        break;
-      default:
-        y = 0;
-        break;
-    }
-    return new fm.icelink.webrtc.layoutFrame(x, y, width, height);
-  };
-
-  baseLayoutManager.prototype.calculateFillFrame = function() {
-    var layoutHeight, layoutWidth;
-    layoutWidth = arguments[0];
-    layoutHeight = arguments[1];
-    return new fm.icelink.webrtc.layoutFrame(0, 0, layoutWidth, layoutHeight);
-  };
-
-  baseLayoutManager.prototype.calculateFloatFrame = function() {
-    var layoutHeight, layoutWidth;
-    layoutWidth = arguments[0];
-    layoutHeight = arguments[1];
-    return this.calculateFloatFrames(layoutWidth, layoutHeight, 1)[0];
-  };
-
-  baseLayoutManager.prototype.calculateFloatFrames = function() {
-    var _var0, _var1, _var2, _var3, _var4, _var5, count, frame, frameArray, j, k, l, layoutHeight, layoutWidth, len, len1, len2, len3, len4, len5, m, n, num, num2, num3, num4, o;
-    layoutWidth = arguments[0];
-    layoutHeight = arguments[1];
-    count = arguments[2];
-    if ((fm.global.equals(this.getFloatWidth(), 0)) && (fm.global.equals(this.getFloatWidthPercent(), 0))) {
-      this.setFloatWidthPercent(0.25);
-    }
-    if ((fm.global.equals(this.getFloatHeight(), 0)) && (fm.global.equals(this.getFloatHeightPercent(), 0))) {
-      this.setFloatHeightPercent(0.25);
-    }
-    num = (this.getFloatWidth() > 0 ? this.getFloatWidth() : layoutWidth * this.getFloatWidthPercent());
-    num2 = (this.getFloatHeight() > 0 ? this.getFloatHeight() : layoutHeight * this.getFloatHeightPercent());
-    num3 = (this.getFloatMarginX() > 0 ? this.getFloatMarginX() : layoutWidth * this.getFloatMarginXPercent());
-    num4 = (this.getFloatMarginY() > 0 ? this.getFloatMarginY() : layoutHeight * this.getFloatMarginYPercent());
-    if (fm.global.equals(this.getDirection(), fm.icelink.webrtc.layoutDirection.Horizontal)) {
-      num = fm.mathAssistant.min(layoutWidth, num * count);
-    } else {
-      num2 = fm.mathAssistant.min(layoutHeight, num2 * count);
-    }
-    frameArray = this.calculateInlineFrames(num, num2, count, 0, 0);
-    switch (this.getAlignment()) {
-      case fm.icelink.webrtc.layoutAlignment.TopLeft:
-      case fm.icelink.webrtc.layoutAlignment.Top:
-      case fm.icelink.webrtc.layoutAlignment.TopRight:
-        _var0 = frameArray;
-        for (j = 0, len = _var0.length; j < len; j++) {
-          frame = _var0[j];
-          frame.setY(frame.getY() + num4);
-        }
-        break;
-      case fm.icelink.webrtc.layoutAlignment.Left:
-      case fm.icelink.webrtc.layoutAlignment.Center:
-      case fm.icelink.webrtc.layoutAlignment.Right:
-        _var1 = frameArray;
-        for (k = 0, len1 = _var1.length; k < len1; k++) {
-          frame = _var1[k];
-          frame.setY(frame.getY() + fm.icelink.webrtc.baseLayoutManager.divideByTwo(layoutHeight - num2));
-        }
-        break;
-      case fm.icelink.webrtc.layoutAlignment.BottomLeft:
-      case fm.icelink.webrtc.layoutAlignment.Bottom:
-      case fm.icelink.webrtc.layoutAlignment.BottomRight:
-        _var2 = frameArray;
-        for (l = 0, len2 = _var2.length; l < len2; l++) {
-          frame = _var2[l];
-          frame.setY(frame.getY() + ((layoutHeight - num2) - num4));
-        }
-        break;
-    }
-    switch (this.getAlignment()) {
-      case fm.icelink.webrtc.layoutAlignment.TopLeft:
-      case fm.icelink.webrtc.layoutAlignment.Left:
-      case fm.icelink.webrtc.layoutAlignment.BottomLeft:
-        _var3 = frameArray;
-        for (m = 0, len3 = _var3.length; m < len3; m++) {
-          frame = _var3[m];
-          frame.setX(frame.getX() + num3);
-        }
-        return frameArray;
-      case fm.icelink.webrtc.layoutAlignment.Top:
-      case fm.icelink.webrtc.layoutAlignment.Center:
-      case fm.icelink.webrtc.layoutAlignment.Bottom:
-        _var4 = frameArray;
-        for (n = 0, len4 = _var4.length; n < len4; n++) {
-          frame = _var4[n];
-          frame.setX(frame.getX() + fm.icelink.webrtc.baseLayoutManager.divideByTwo(layoutWidth - num));
-        }
-        return frameArray;
-      case fm.icelink.webrtc.layoutAlignment.TopRight:
-      case fm.icelink.webrtc.layoutAlignment.Right:
-      case fm.icelink.webrtc.layoutAlignment.BottomRight:
-        _var5 = frameArray;
-        for (o = 0, len5 = _var5.length; o < len5; o++) {
-          frame = _var5[o];
-          frame.setX(frame.getX() + ((layoutWidth - num) - num3));
-        }
-        return frameArray;
-    }
-    return frameArray;
-  };
-
-  baseLayoutManager.prototype.calculateInlineFrame = function() {
-    var cellHeight, cellWidth, cellX, cellY, num, width, x, y;
-    cellX = arguments[0];
-    cellY = arguments[1];
-    cellWidth = arguments[2];
-    cellHeight = arguments[3];
-    num = fm.icelink.webrtc.baseLayoutManager.divideByTwo(this.getInlineMargin());
-    x = cellX - num;
-    y = cellY - num;
-    width = cellWidth - this.getInlineMargin();
-    return new fm.icelink.webrtc.layoutFrame(x, y, width, cellHeight - this.getInlineMargin());
-  };
-
-  baseLayoutManager.prototype.calculateInlineFrames = function() {
-    var baseX, baseY, cellHeight, cellWidth, columnCount, count, frame, layoutHeight, layoutWidth, list, num10, num11, num12, num13, num14, num15, num16, num17, num18, num5, num6, num7, num8, num9, rowCount, table;
-    layoutWidth = arguments[0];
-    layoutHeight = arguments[1];
-    count = arguments[2];
-    baseX = arguments[3];
-    baseY = arguments[4];
-    list = [];
-    table = fm.icelink.webrtc.baseLayoutManager.calculateTable(layoutWidth + this.getInlineMargin(), layoutHeight + this.getInlineMargin(), count);
-    columnCount = table.getColumnCount();
-    rowCount = table.getRowCount();
-    cellWidth = table.getCellWidth();
-    cellHeight = table.getCellHeight();
-    num5 = fm.icelink.webrtc.baseLayoutManager.divideByTwo(this.getInlineMargin());
-    if (fm.global.equals(this.getDirection(), fm.icelink.webrtc.layoutDirection.Horizontal)) {
-      num6 = 0;
-      num7 = baseY + num5;
-      num8 = (layoutHeight - (rowCount * cellHeight)) + this.getInlineMargin();
-      num9 = 0;
-      while (num9 < rowCount) {
-        num10 = (num9 < num8 ? 1 : 0);
-        num11 = columnCount;
-        if (fm.global.equals(num9, rowCount - 1)) {
-          num11 = count - num6;
-        }
-        num12 = baseX + num5;
-        if ((fm.global.equals(num9, rowCount - 1)) && (rowCount > 1)) {
-          num13 = num12 - num5;
-          num14 = num7 - num5;
-          fm.arrayExtensions.addRange(list, this.calculateInlineFrames(baseX + layoutWidth, (baseY + layoutHeight) - num14, num11, num13, num14));
-        } else {
-          num15 = (layoutWidth - (num11 * cellWidth)) + this.getInlineMargin();
-          num16 = 0;
-          while (num16 < num11) {
-            num17 = (num16 < num15 ? 1 : 0);
-            frame = this.calculateInlineFrame(num12, num7, cellWidth + num17, cellHeight + num10);
-            fm.arrayExtensions.add(list, frame);
-            num12 = num12 + (cellWidth + num17);
-            num16++;
-            num6++;
-          }
-        }
-        num7 = num7 + (cellHeight + num10);
-        num9++;
-      }
-    } else {
-      num6 = 0;
-      num12 = baseX + num5;
-      num15 = (layoutWidth - (columnCount * cellWidth)) + this.getInlineMargin();
-      num16 = 0;
-      while (num16 < columnCount) {
-        try {
-          num17 = (num16 < num15 ? 1 : 0);
-          num18 = rowCount;
-          if (fm.global.equals(num16, columnCount - 1)) {
-            num18 = count - num6;
-          }
-          num7 = baseY + num5;
-          if ((fm.global.equals(num16, columnCount - 1)) && (columnCount > 1)) {
-            num13 = num12 - num5;
-            num14 = num7 - num5;
-            fm.arrayExtensions.addRange(list, this.calculateInlineFrames((baseX + layoutWidth) - num13, baseY + layoutHeight, num18, num13, num14));
-          } else {
-            num8 = (layoutHeight - (num18 * cellHeight)) + this.getInlineMargin();
-            num9 = 0;
-            while (num9 < num18) {
-              num10 = (num9 < num8 ? 1 : 0);
-              frame = this.calculateInlineFrame(num12, num7, cellWidth + num17, cellHeight + num10);
-              fm.arrayExtensions.add(list, frame);
-              num7 = num7 + (cellHeight + num10);
-              num9++;
-              num6++;
-            }
-          }
-          num12 = num12 + (cellWidth + num17);
-        } finally {
-          num16++;
-        }
-      }
-    }
-    return fm.arrayExtensions.toArray(list);
-  };
-
 
   /*<span id='method-fm.icelink.webrtc.baseLayoutManager-doLayout'>&nbsp;</span> */
 
@@ -6115,262 +6517,6 @@ fm.icelink.webrtc.baseLayoutManager = (function(superClass) {
     }
   };
 
-  baseLayoutManager.prototype.getBlockLayout = function() {
-    var _var0, _var1, _var2, baseX, baseY, count, frame, layout, layoutHeight, layoutWidth, list, marginX, marginY, num10, num4, num7, num8, num9, remoteCount;
-    layoutWidth = arguments[0];
-    layoutHeight = arguments[1];
-    remoteCount = arguments[2];
-    marginX = 0;
-    marginY = 0;
-    _var0 = new fm.holder(marginX);
-    _var1 = new fm.holder(marginY);
-    _var2 = this.calculateBlockFrame(layoutWidth, layoutHeight, _var0, _var1);
-    marginX = _var0.getValue();
-    marginY = _var1.getValue();
-    frame = _var2;
-    list = [];
-    if (fm.global.equals(this.getAlignment(), fm.icelink.webrtc.layoutAlignment.Center)) {
-      count = fm.icelink.webrtc.baseLayoutManager.divideByTwo(remoteCount);
-      num4 = remoteCount - count;
-      baseX = 0;
-      baseY = 0;
-      if (fm.global.equals(this.getDirection(), fm.icelink.webrtc.layoutDirection.Vertical)) {
-        num7 = (frame.getWidth() + marginX) + marginX;
-        layoutWidth = fm.icelink.webrtc.baseLayoutManager.divideByTwo(layoutWidth - num7);
-        baseX = layoutWidth + num7;
-      } else {
-        num8 = (frame.getHeight() + marginY) + marginY;
-        layoutHeight = fm.icelink.webrtc.baseLayoutManager.divideByTwo(layoutHeight - num8);
-        baseY = layoutHeight + num8;
-      }
-      if (count > 0) {
-        fm.arrayExtensions.addRange(list, this.calculateInlineFrames(layoutWidth, layoutHeight, count, 0, 0));
-      }
-      if (num4 > 0) {
-        fm.arrayExtensions.addRange(list, this.calculateInlineFrames(layoutWidth, layoutHeight, num4, baseX, baseY));
-      }
-    } else {
-      num9 = 0;
-      num10 = 0;
-      num7 = frame.getWidth() + marginX;
-      num8 = frame.getHeight() + marginY;
-      if (fm.global.equals(this.getAlignment(), fm.icelink.webrtc.layoutAlignment.Top)) {
-        num10 = num8;
-        layoutHeight = layoutHeight - num8;
-      } else {
-        if (fm.global.equals(this.getAlignment(), fm.icelink.webrtc.layoutAlignment.Bottom)) {
-          layoutHeight = layoutHeight - num8;
-        } else {
-          if (fm.global.equals(this.getAlignment(), fm.icelink.webrtc.layoutAlignment.Left)) {
-            num9 = num7;
-            layoutWidth = layoutWidth - num7;
-          } else {
-            if (fm.global.equals(this.getAlignment(), fm.icelink.webrtc.layoutAlignment.Right)) {
-              layoutWidth = layoutWidth - num7;
-            } else {
-              if (fm.global.equals(this.getDirection(), fm.icelink.webrtc.layoutDirection.Vertical)) {
-                if ((fm.global.equals(this.getAlignment(), fm.icelink.webrtc.layoutAlignment.TopLeft)) || (fm.global.equals(this.getAlignment(), fm.icelink.webrtc.layoutAlignment.BottomLeft))) {
-                  num9 = num7;
-                }
-                layoutWidth = layoutWidth - num7;
-              } else {
-                if ((fm.global.equals(this.getAlignment(), fm.icelink.webrtc.layoutAlignment.TopLeft)) || (fm.global.equals(this.getAlignment(), fm.icelink.webrtc.layoutAlignment.TopRight))) {
-                  num10 = num8;
-                }
-                layoutHeight = layoutHeight - num8;
-              }
-            }
-          }
-        }
-      }
-      fm.arrayExtensions.addRange(list, this.calculateInlineFrames(layoutWidth, layoutHeight, remoteCount, num9, num10));
-    }
-    layout = new fm.icelink.webrtc.layout();
-    layout.setLocalFrame(frame);
-    layout.setRemoteFrames(fm.arrayExtensions.toArray(list));
-    return layout;
-  };
-
-  baseLayoutManager.prototype.getBottomRowIndexes = function() {
-    var frames, num2, num3, num4, numArray, yMax;
-    frames = arguments[0];
-    yMax = fm.icelink.webrtc.baseLayoutManager.getYMax(frames);
-    num2 = 0;
-    num3 = 0;
-    while (num3 < frames.length) {
-      try {
-        if (fm.global.equals(frames[num3].getY(), yMax)) {
-          num2++;
-        }
-      } finally {
-        num3++;
-      }
-    }
-    num4 = 0;
-    numArray = new Array(num2);
-    num3 = 0;
-    while (num3 < frames.length) {
-      try {
-        if (fm.global.equals(frames[num3].getY(), yMax)) {
-          numArray[num4++] = num3;
-        }
-      } finally {
-        num3++;
-      }
-    }
-    return numArray;
-  };
-
-  baseLayoutManager.prototype.getCenterColumnIndexes = function() {
-    var frames, num2, num3, num4, numArray, xMid;
-    frames = arguments[0];
-    xMid = fm.icelink.webrtc.baseLayoutManager.getXMid(frames);
-    num2 = 0;
-    num3 = 0;
-    while (num3 < frames.length) {
-      try {
-        if (fm.global.equals(frames[num3].getX(), xMid)) {
-          num2++;
-        }
-      } finally {
-        num3++;
-      }
-    }
-    num4 = 0;
-    numArray = new Array(num2);
-    num3 = 0;
-    while (num3 < frames.length) {
-      try {
-        if (fm.global.equals(frames[num3].getX(), xMid)) {
-          numArray[num4++] = num3;
-        }
-      } finally {
-        num3++;
-      }
-    }
-    return numArray;
-  };
-
-  baseLayoutManager.prototype.getCenterRowIndexes = function() {
-    var frames, num2, num3, num4, numArray, yMid;
-    frames = arguments[0];
-    yMid = fm.icelink.webrtc.baseLayoutManager.getYMid(frames);
-    num2 = 0;
-    num3 = 0;
-    while (num3 < frames.length) {
-      try {
-        if (fm.global.equals(frames[num3].getY(), yMid)) {
-          num2++;
-        }
-      } finally {
-        num3++;
-      }
-    }
-    num4 = 0;
-    numArray = new Array(num2);
-    num3 = 0;
-    while (num3 < frames.length) {
-      try {
-        if (fm.global.equals(frames[num3].getY(), yMid)) {
-          numArray[num4++] = num3;
-        }
-      } finally {
-        num3++;
-      }
-    }
-    return numArray;
-  };
-
-  baseLayoutManager.prototype.getFloatLocalLayout = function() {
-    var layout, layoutHeight, layoutWidth, remoteCount;
-    layoutWidth = arguments[0];
-    layoutHeight = arguments[1];
-    remoteCount = arguments[2];
-    layout = new fm.icelink.webrtc.layout();
-    layout.setLocalFrame(this.calculateFloatFrame(layoutWidth, layoutHeight));
-    layout.setRemoteFrames(this.calculateInlineFrames(layoutWidth, layoutHeight, remoteCount, 0, 0));
-    return layout;
-  };
-
-  baseLayoutManager.prototype.getFloatRemoteLayout = function() {
-    var layout, layoutHeight, layoutWidth, remoteCount;
-    layoutWidth = arguments[0];
-    layoutHeight = arguments[1];
-    remoteCount = arguments[2];
-    layout = new fm.icelink.webrtc.layout();
-    layout.setLocalFrame(this.calculateFillFrame(layoutWidth, layoutHeight));
-    layout.setRemoteFrames(this.calculateFloatFrames(layoutWidth, layoutHeight, remoteCount));
-    return layout;
-  };
-
-  baseLayoutManager.prototype.getInlineLayout = function() {
-    var centerRowIndexes, frames, index, layout, layoutHeight, layoutWidth, leftColumnIndexes, remoteCount, topRowIndexes;
-    layoutWidth = arguments[0];
-    layoutHeight = arguments[1];
-    remoteCount = arguments[2];
-    frames = this.calculateInlineFrames(layoutWidth, layoutHeight, remoteCount + 1, 0, 0);
-    index = 0;
-    if (fm.global.equals(this.getAlignment(), fm.icelink.webrtc.layoutAlignment.TopLeft)) {
-      index = 0;
-    } else {
-      if (fm.global.equals(this.getAlignment(), fm.icelink.webrtc.layoutAlignment.Top)) {
-        topRowIndexes = this.getTopRowIndexes(frames);
-        index = topRowIndexes[fm.icelink.webrtc.baseLayoutManager.divideByTwo(topRowIndexes.length)];
-      } else {
-        if (fm.global.equals(this.getAlignment(), fm.icelink.webrtc.layoutAlignment.TopRight)) {
-          if (fm.global.equals(this.getDirection(), fm.icelink.webrtc.layoutDirection.Horizontal)) {
-            centerRowIndexes = this.getTopRowIndexes(frames);
-            index = centerRowIndexes[centerRowIndexes.length - 1];
-          } else {
-            index = this.getRightColumnIndexes(frames)[0];
-          }
-        } else {
-          if (fm.global.equals(this.getAlignment(), fm.icelink.webrtc.layoutAlignment.Left)) {
-            leftColumnIndexes = this.getLeftColumnIndexes(frames);
-            index = leftColumnIndexes[fm.icelink.webrtc.baseLayoutManager.divideByTwo(leftColumnIndexes.length)];
-          } else {
-            if (fm.global.equals(this.getAlignment(), fm.icelink.webrtc.layoutAlignment.Center)) {
-              if (fm.global.equals(this.getDirection(), fm.icelink.webrtc.layoutDirection.Horizontal)) {
-                centerRowIndexes = this.getCenterRowIndexes(frames);
-                index = centerRowIndexes[fm.icelink.webrtc.baseLayoutManager.divideByTwo(centerRowIndexes.length)];
-              } else {
-                leftColumnIndexes = this.getCenterColumnIndexes(frames);
-                index = leftColumnIndexes[fm.icelink.webrtc.baseLayoutManager.divideByTwo(leftColumnIndexes.length)];
-              }
-            } else {
-              if (fm.global.equals(this.getAlignment(), fm.icelink.webrtc.layoutAlignment.Right)) {
-                leftColumnIndexes = this.getRightColumnIndexes(frames);
-                index = leftColumnIndexes[fm.icelink.webrtc.baseLayoutManager.divideByTwo(leftColumnIndexes.length)];
-              } else {
-                if (fm.global.equals(this.getAlignment(), fm.icelink.webrtc.layoutAlignment.BottomLeft)) {
-                  if (fm.global.equals(this.getDirection(), fm.icelink.webrtc.layoutDirection.Horizontal)) {
-                    index = this.getBottomRowIndexes(frames)[0];
-                  } else {
-                    leftColumnIndexes = this.getLeftColumnIndexes(frames);
-                    index = leftColumnIndexes[leftColumnIndexes.length - 1];
-                  }
-                } else {
-                  if (fm.global.equals(this.getAlignment(), fm.icelink.webrtc.layoutAlignment.Bottom)) {
-                    centerRowIndexes = this.getBottomRowIndexes(frames);
-                    index = centerRowIndexes[fm.icelink.webrtc.baseLayoutManager.divideByTwo(centerRowIndexes.length)];
-                  } else {
-                    if (fm.global.equals(this.getAlignment(), fm.icelink.webrtc.layoutAlignment.BottomRight)) {
-                      index = frames.length - 1;
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    layout = new fm.icelink.webrtc.layout();
-    layout.setLocalFrame(frames[index]);
-    layout.setRemoteFrames(fm.icelink.webrtc.baseLayoutManager.spliceLayoutFrame(frames, index));
-    return layout;
-  };
-
 
   /*<span id='method-fm.icelink.webrtc.baseLayoutManager-getLayout'>&nbsp;</span> */
 
@@ -6387,45 +6533,16 @@ fm.icelink.webrtc.baseLayoutManager = (function(superClass) {
    */
 
   baseLayoutManager.prototype.getLayout = function() {
-    var _var0, error, exception, frame, j, layoutHeight, layoutWidth, len, onLayout, p, remoteCount, singleLayout;
+    var error, exception, layout, layoutHeight, layoutWidth, onLayout, p, remoteCount;
     layoutWidth = arguments[0];
     layoutHeight = arguments[1];
     remoteCount = arguments[2];
-    if (layoutWidth < 0) {
-      layoutWidth = 0;
-    }
-    if (layoutHeight < 0) {
-      layoutHeight = 0;
-    }
-    singleLayout = new fm.icelink.webrtc.layout();
-    if (fm.global.equals(remoteCount, 0)) {
-      singleLayout = fm.icelink.webrtc.baseLayoutManager.getSingleLayout(layoutWidth, layoutHeight);
-    } else {
-      if (fm.global.equals(this.getMode(), fm.icelink.webrtc.layoutMode.FloatLocal)) {
-        singleLayout = this.getFloatLocalLayout(layoutWidth, layoutHeight, remoteCount);
-      } else {
-        if (fm.global.equals(this.getMode(), fm.icelink.webrtc.layoutMode.FloatRemote)) {
-          singleLayout = this.getFloatRemoteLayout(layoutWidth, layoutHeight, remoteCount);
-        } else {
-          if (fm.global.equals(this.getMode(), fm.icelink.webrtc.layoutMode.Block)) {
-            singleLayout = this.getBlockLayout(layoutWidth, layoutHeight, remoteCount);
-          } else {
-            singleLayout = this.getInlineLayout(layoutWidth, layoutHeight, remoteCount);
-          }
-        }
-      }
-    }
-    fm.icelink.webrtc.baseLayoutManager.transformFrame(singleLayout.getLocalFrame(), this.getLayoutOrigin(), layoutWidth, layoutHeight);
-    _var0 = singleLayout.getRemoteFrames();
-    for (j = 0, len = _var0.length; j < len; j++) {
-      frame = _var0[j];
-      fm.icelink.webrtc.baseLayoutManager.transformFrame(frame, this.getLayoutOrigin(), layoutWidth, layoutHeight);
-    }
+    layout = this.calculateLayout(layoutWidth, layoutHeight, remoteCount, this.getLayoutOrigin());
     onLayout = this.getOnLayout();
     if (!fm.global.equals(onLayout, null)) {
       try {
         p = new fm.icelink.webrtc.layoutArgs();
-        p.setLayout(singleLayout);
+        p.setLayout(layout);
         p.setLayoutWidth(layoutWidth);
         p.setLayoutHeight(layoutHeight);
         p.setRemoteCount(remoteCount);
@@ -6440,7 +6557,7 @@ fm.icelink.webrtc.baseLayoutManager = (function(superClass) {
 
       }
     }
-    return singleLayout;
+    return layout;
   };
 
 
@@ -6459,36 +6576,6 @@ fm.icelink.webrtc.baseLayoutManager = (function(superClass) {
 
   baseLayoutManager.prototype.getLayoutOrigin = function() {
     return this._layoutOrigin;
-  };
-
-  baseLayoutManager.prototype.getLeftColumnIndexes = function() {
-    var frames, num2, num3, num4, numArray, xMin;
-    frames = arguments[0];
-    xMin = fm.icelink.webrtc.baseLayoutManager.getXMin(frames);
-    num2 = 0;
-    num3 = 0;
-    while (num3 < frames.length) {
-      try {
-        if (fm.global.equals(frames[num3].getX(), xMin)) {
-          num2++;
-        }
-      } finally {
-        num3++;
-      }
-    }
-    num4 = 0;
-    numArray = new Array(num2);
-    num3 = 0;
-    while (num3 < frames.length) {
-      try {
-        if (fm.global.equals(frames[num3].getX(), xMin)) {
-          numArray[num4++] = num3;
-        }
-      } finally {
-        num3++;
-      }
-    }
-    return numArray;
   };
 
 
@@ -6625,9 +6712,6 @@ fm.icelink.webrtc.baseLayoutManager = (function(superClass) {
 
   baseLayoutManager.prototype.getRemoteVideoControls = function() {
     var _var0, j, len, list, peerIds, str;
-    if (arguments.length === 0) {
-      return this.getRemoteVideoControls(this.getPeerIds());
-    }
     if (arguments.length === 1) {
       peerIds = arguments[0];
       if (fm.global.equals(peerIds, null)) {
@@ -6640,6 +6724,9 @@ fm.icelink.webrtc.baseLayoutManager = (function(superClass) {
         fm.arrayExtensions.add(list, this.getRemoteVideoControl(str));
       }
       return fm.arrayExtensions.toArray(list);
+    }
+    if (arguments.length === 0) {
+      return this.getRemoteVideoControls(this.getPeerIds());
     }
   };
 
@@ -6657,66 +6744,6 @@ fm.icelink.webrtc.baseLayoutManager = (function(superClass) {
       objArray = null;
     }
     return objArray;
-  };
-
-  baseLayoutManager.prototype.getRightColumnIndexes = function() {
-    var frames, num2, num3, num4, numArray, xMax;
-    frames = arguments[0];
-    xMax = fm.icelink.webrtc.baseLayoutManager.getXMax(frames);
-    num2 = 0;
-    num3 = 0;
-    while (num3 < frames.length) {
-      try {
-        if (fm.global.equals(frames[num3].getX(), xMax)) {
-          num2++;
-        }
-      } finally {
-        num3++;
-      }
-    }
-    num4 = 0;
-    numArray = new Array(num2);
-    num3 = 0;
-    while (num3 < frames.length) {
-      try {
-        if (fm.global.equals(frames[num3].getX(), xMax)) {
-          numArray[num4++] = num3;
-        }
-      } finally {
-        num3++;
-      }
-    }
-    return numArray;
-  };
-
-  baseLayoutManager.prototype.getTopRowIndexes = function() {
-    var frames, num2, num3, num4, numArray, yMin;
-    frames = arguments[0];
-    yMin = fm.icelink.webrtc.baseLayoutManager.getYMin(frames);
-    num2 = 0;
-    num3 = 0;
-    while (num3 < frames.length) {
-      try {
-        if (fm.global.equals(frames[num3].getY(), yMin)) {
-          num2++;
-        }
-      } finally {
-        num3++;
-      }
-    }
-    num4 = 0;
-    numArray = new Array(num2);
-    num3 = 0;
-    while (num3 < frames.length) {
-      try {
-        if (fm.global.equals(frames[num3].getY(), yMin)) {
-          numArray[num4++] = num3;
-        }
-      } finally {
-        num3++;
-      }
-    }
-    return numArray;
   };
 
   baseLayoutManager.prototype.raiseUnhandledException = function() {
@@ -10650,7 +10677,7 @@ fm.icelink.webrtc.jsAudioRenderProvider = (function(superClass) {
 
   jsAudioRenderProvider.prototype.setRemoteStream = function(remoteStream) {
     this._stream = remoteStream.getBackingStream();
-    if (this._stream.getVideoTracks().length === 0) {
+    if (this._stream && this._stream.getVideoTracks().length === 0) {
       return this.attachToAudio(false);
     }
   };
@@ -12851,10 +12878,11 @@ fm.icelink.webrtc.localMediaStream = (function(superClass) {
       }
     } else if (arguments.length === 3) {
       try {
-        return this.doStart(startArgs, audioDeviceId, videoDeviceId, false);
+        deprecated = !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia;
+        return this.doStart(startArgs, audioDeviceId, videoDeviceId, deprecated);
       } catch (error3) {
         ex = error3;
-        return this.doStart(startArgs, audioDeviceId, videoDeviceId, true);
+        return this.doStart(startArgs, audioDeviceId, videoDeviceId, !deprecated);
       }
     } else if (arguments.length === 4) {
       getUserMediaSuccess = (function(_this) {
@@ -13667,8 +13695,8 @@ fm.icelink.webrtc.layoutManager = (function(superClass) {
   })(this);
   fm.icelink.webrtc.getCoreActiveX = function(args) {
     var x64_cc_classId, x86_cc_classId;
-    x86_cc_classId = '37C0AE8D-A6D0-31B5-F674-23B289CA4A54';
-    x64_cc_classId = '69DC52BD-3857-B094-8E01-252F38BF0A6A';
+    x86_cc_classId = 'D3579C7A-213E-19F1-36D7-FFFB7F5BAF66';
+    x64_cc_classId = 'CD2F5C3D-ACA2-5C31-672B-7D473BBC8829';
     return fm.icelink.webrtc.getActiveX(fm.util.extend({
       id: 'static',
       className: 'FM.IceLink.WebRTC.ActiveX.CoreControl',
@@ -13703,8 +13731,8 @@ fm.icelink.webrtc.layoutManager = (function(superClass) {
   };
   return fm.icelink.webrtc.getVideoContainerActiveX = function(args) {
     var x64_vcc_classId, x86_vcc_classId;
-    x86_vcc_classId = '31EE9203-C0DB-A0A6-2237-023F1C19C9CD';
-    x64_vcc_classId = '671102A2-4662-94C9-7C0F-73D96245C3BC';
+    x86_vcc_classId = '4FBA8D86-15F0-39FB-A315-45FACCD55D28';
+    x64_vcc_classId = '81C19F92-EDB6-425F-6217-F5D6F5E0F007';
     return fm.icelink.webrtc.getActiveX(fm.util.extend({
       className: 'FM.IceLink.WebRTC.ActiveX.VideoContainerControl',
       classId: window.navigator.cpuClass === 'x86' ? x86_vcc_classId : x64_vcc_classId
@@ -13716,6 +13744,13 @@ fm.icelink.webrtc.layoutManager = (function(superClass) {
 (function() {
   var dataChannelStreamClass, dataChannelStreamConstructor, dataChannelStreamPrototype, fn, i, len, linkProps, linkPrototype, localMediaStreamProps, localMediaStreamPrototype, prop, reliableDataStreamClass, reliableDataStreamConstructor, reliableDataStreamPrototype, results, streamType, streamTypes, value;
   navigator.fmGetUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    navigator.fmGetUserMedia = (function(_this) {
+      return function(constraints, success, failure) {
+        return navigator.mediaDevices.getUserMedia(constraints).then(success)["catch"](failure);
+      };
+    })(this);
+  }
   fm.icelink.webrtc._forceNative = false;
   fm.icelink.webrtc._forceActiveX = false;
   fm.icelink.webrtc._forceApplet = false;
