@@ -1,7 +1,7 @@
 
 /*
  * Title: IceLink for JavaScript
- * Version: 2.8.9
+ * Version: 2.9.1
  * Copyright Frozen Mountain Software 2011+
  */
 
@@ -25,7 +25,7 @@ if (!window.fm) { throw new Error("fm must be loaded before fm.icelink."); }
 if (!window.fm.icelink) { window.fm.icelink = {}; }
 
 fm.icelink.getVersion = function() {
-  return '2.8.9';
+  return '2.9.1';
 };
 
 
@@ -2048,6 +2048,8 @@ fm.icelink.baseConference = (function(superClass) {
 
   baseConference.prototype.__candidateMode = null;
 
+  baseConference.prototype.__deadStreamTimeout = 0;
+
   baseConference.prototype.__dtlsCipherSuites = null;
 
   baseConference.prototype.__dtlsClientVersion = null;
@@ -2081,6 +2083,8 @@ fm.icelink.baseConference = (function(superClass) {
   baseConference.prototype._iceUsernameFragment = null;
 
   baseConference.prototype._id = null;
+
+  baseConference.prototype._publicIPAddress = null;
 
   baseConference.prototype._relayPasswords = null;
 
@@ -2118,6 +2122,7 @@ fm.icelink.baseConference = (function(superClass) {
     this.setRelayRealm = bind(this.setRelayRealm, this);
     this.setRelayPasswords = bind(this.setRelayPasswords, this);
     this.setRelayPassword = bind(this.setRelayPassword, this);
+    this.setPublicIPAddress = bind(this.setPublicIPAddress, this);
     this.setKeepAliveInterval = bind(this.setKeepAliveInterval, this);
     this.setId = bind(this.setId, this);
     this.setIceUsernameFragment = bind(this.setIceUsernameFragment, this);
@@ -2129,6 +2134,7 @@ fm.icelink.baseConference = (function(superClass) {
     this.setDtlsCipherSuites = bind(this.setDtlsCipherSuites, this);
     this.setDtlsCertificate = bind(this.setDtlsCertificate, this);
     this.setDisableAutomaticReports = bind(this.setDisableAutomaticReports, this);
+    this.setDeadStreamTimeout = bind(this.setDeadStreamTimeout, this);
     this.setCname = bind(this.setCname, this);
     this.setCandidateMode = bind(this.setCandidateMode, this);
     this.getVirtualAdapters = bind(this.getVirtualAdapters, this);
@@ -2150,6 +2156,7 @@ fm.icelink.baseConference = (function(superClass) {
     this.getRelayRealm = bind(this.getRelayRealm, this);
     this.getRelayPasswords = bind(this.getRelayPasswords, this);
     this.getRelayPassword = bind(this.getRelayPassword, this);
+    this.getPublicIPAddress = bind(this.getPublicIPAddress, this);
     this.getKeepAliveInterval = bind(this.getKeepAliveInterval, this);
     this.getId = bind(this.getId, this);
     this.getIceUsernameFragment = bind(this.getIceUsernameFragment, this);
@@ -2161,6 +2168,7 @@ fm.icelink.baseConference = (function(superClass) {
     this.getDtlsCipherSuites = bind(this.getDtlsCipherSuites, this);
     this.getDtlsCertificate = bind(this.getDtlsCertificate, this);
     this.getDisableAutomaticReports = bind(this.getDisableAutomaticReports, this);
+    this.getDeadStreamTimeout = bind(this.getDeadStreamTimeout, this);
     this.getCname = bind(this.getCname, this);
     this.getCanSend = bind(this.getCanSend, this);
     this.getCanReceive = bind(this.getCanReceive, this);
@@ -2170,6 +2178,7 @@ fm.icelink.baseConference = (function(superClass) {
     if (arguments.length === 1 && fm.util.isPlainObject(arguments[0])) {
       instance = baseConference.__super__.constructor.call(this);
       this.__keepAliveInterval = 1000;
+      this.__deadStreamTimeout = 15000;
       this.__dtlsCipherSuites = [fm.icelink.cipherSuite.Aes128Sha, fm.icelink.cipherSuite.DhRsaAes128Sha, fm.icelink.cipherSuite.EcdhRsaAes128Sha, fm.icelink.cipherSuite.DheRsaAes128Sha, fm.icelink.cipherSuite.EcdheRsaAes128Sha, fm.icelink.cipherSuite.EcdheEcdsaAes128Sha];
       this.__dtlsServerMinVersion = fm.icelink.protocolVersion.Dtls10;
       this.__dtlsServerMaxVersion = fm.icelink.protocolVersion.Dtls12;
@@ -2185,6 +2194,7 @@ fm.icelink.baseConference = (function(superClass) {
     }
     instance = baseConference.__super__.constructor.call(this);
     this.__keepAliveInterval = 1000;
+    this.__deadStreamTimeout = 15000;
     this.__dtlsCipherSuites = [fm.icelink.cipherSuite.Aes128Sha, fm.icelink.cipherSuite.DhRsaAes128Sha, fm.icelink.cipherSuite.EcdhRsaAes128Sha, fm.icelink.cipherSuite.DheRsaAes128Sha, fm.icelink.cipherSuite.EcdheRsaAes128Sha, fm.icelink.cipherSuite.EcdheEcdsaAes128Sha];
     this.__dtlsServerMinVersion = fm.icelink.protocolVersion.Dtls10;
     this.__dtlsServerMaxVersion = fm.icelink.protocolVersion.Dtls12;
@@ -2239,6 +2249,7 @@ fm.icelink.baseConference = (function(superClass) {
     this.setSuppressRelayCandidates(baseLink.getSuppressRelayCandidates());
     this.setDisableAutomaticReports(baseLink.getDisableAutomaticReports());
     this.setKeepAliveInterval(baseLink.getKeepAliveInterval());
+    this.setDeadStreamTimeout(baseLink.getDeadStreamTimeout());
     this.setDtlsCertificate(baseLink.getDtlsCertificate());
     this.setDtlsCipherSuites(baseLink.getDtlsCipherSuites());
     this.setDtlsServerMinVersion(baseLink.getDtlsServerMinVersion());
@@ -2253,6 +2264,7 @@ fm.icelink.baseConference = (function(superClass) {
     this.setSctpPortMax(baseLink.getSctpPortMax());
     this.setCandidateMode(baseLink.getCandidateMode());
     this.setEarlyCandidatesTimeout(baseLink.getEarlyCandidatesTimeout());
+    this.setPublicIPAddress(baseLink.getPublicIPAddress());
     return this.setVirtualAdapters(baseLink.getVirtualAdapters());
   };
 
@@ -2338,6 +2350,24 @@ fm.icelink.baseConference = (function(superClass) {
 
   baseConference.prototype.getCname = function() {
     return this._cname;
+  };
+
+
+  /*<span id='method-fm.icelink.baseConference-getDeadStreamTimeout'>&nbsp;</span> */
+
+
+  /**
+  	 <div>
+  	 Gets a value indicating how many milliseconds must elapse with no receive activity before a stream is considered dead.
+  	 Defaults to 15000.
+  	 </div>
+  
+  	@function getDeadStreamTimeout
+  	@return {Integer}
+   */
+
+  baseConference.prototype.getDeadStreamTimeout = function() {
+    return this.__deadStreamTimeout;
   };
 
 
@@ -2538,6 +2568,28 @@ fm.icelink.baseConference = (function(superClass) {
 
   baseConference.prototype.getKeepAliveInterval = function() {
     return this.__keepAliveInterval;
+  };
+
+
+  /*<span id='method-fm.icelink.baseConference-getPublicIPAddress'>&nbsp;</span> */
+
+
+  /**
+  	 <div>
+  	 Gets the public IP address of this
+  	 device, if the NAT is known to be 1:1 and
+  	 the IP address is known in advance. This
+  	 should only be used in controlled server
+  	 environments as an alternative to using
+  	 an external STUN server.
+  	 </div>
+  
+  	@function getPublicIPAddress
+  	@return {String}
+   */
+
+  baseConference.prototype.getPublicIPAddress = function() {
+    return this._publicIPAddress;
   };
 
 
@@ -2951,6 +3003,27 @@ fm.icelink.baseConference = (function(superClass) {
   };
 
 
+  /*<span id='method-fm.icelink.baseConference-setDeadStreamTimeout'>&nbsp;</span> */
+
+
+  /**
+  	 <div>
+  	 Sets a value indicating how many milliseconds must elapse with no receive activity before a stream is considered dead.
+  	 Defaults to 15000.
+  	 </div>
+  
+  	@function setDeadStreamTimeout
+  	@param {Integer} value
+  	@return {void}
+   */
+
+  baseConference.prototype.setDeadStreamTimeout = function() {
+    var value;
+    value = arguments[0];
+    return this.__deadStreamTimeout = value;
+  };
+
+
   /*<span id='method-fm.icelink.baseConference-setDisableAutomaticReports'>&nbsp;</span> */
 
 
@@ -3181,6 +3254,31 @@ fm.icelink.baseConference = (function(superClass) {
     var value;
     value = arguments[0];
     return this.__keepAliveInterval = value;
+  };
+
+
+  /*<span id='method-fm.icelink.baseConference-setPublicIPAddress'>&nbsp;</span> */
+
+
+  /**
+  	 <div>
+  	 Sets the public IP address of this
+  	 device, if the NAT is known to be 1:1 and
+  	 the IP address is known in advance. This
+  	 should only be used in controlled server
+  	 environments as an alternative to using
+  	 an external STUN server.
+  	 </div>
+  
+  	@function setPublicIPAddress
+  	@param {String} value
+  	@return {void}
+   */
+
+  baseConference.prototype.setPublicIPAddress = function() {
+    var value;
+    value = arguments[0];
+    return this._publicIPAddress = value;
   };
 
 
@@ -12250,7 +12348,15 @@ var bind = function(fn, me){ return function(){ return fn.apply(me, arguments); 
 fm.icelink.candidate = (function(superClass) {
   extend(candidate, superClass);
 
+  candidate.__hostTypePreference = 0;
+
+  candidate.__peerReflexiveTypePreference = 0;
+
+  candidate.__relayTypePreference = 0;
+
   candidate.prototype.__sdpCandidateAttribute = null;
+
+  candidate.__serverReflexiveTypePreference = 0;
 
   candidate.prototype._sdpMediaIndex = null;
 
@@ -12307,6 +12413,78 @@ fm.icelink.candidate = (function(superClass) {
     var candidatesJson;
     candidatesJson = arguments[0];
     return fm.icelink.serializer.deserializeCandidateArray(candidatesJson);
+  };
+
+
+  /*<span id='method-fm.icelink.candidate-getHostTypePreference'>&nbsp;</span> */
+
+
+  /**
+  	 <div>
+  	 Gets the default type preference for a
+  	 host candidate. Defaults to 126.
+  	 </div>
+  
+  	@function getHostTypePreference
+  	@return {Integer}
+   */
+
+  candidate.getHostTypePreference = function() {
+    return fm.icelink.candidate.__hostTypePreference;
+  };
+
+
+  /*<span id='method-fm.icelink.candidate-getPeerReflexiveTypePreference'>&nbsp;</span> */
+
+
+  /**
+  	 <div>
+  	 Gets the default type preference for a
+  	 host candidate. Defaults to 110.
+  	 </div>
+  
+  	@function getPeerReflexiveTypePreference
+  	@return {Integer}
+   */
+
+  candidate.getPeerReflexiveTypePreference = function() {
+    return fm.icelink.candidate.__peerReflexiveTypePreference;
+  };
+
+
+  /*<span id='method-fm.icelink.candidate-getRelayTypePreference'>&nbsp;</span> */
+
+
+  /**
+  	 <div>
+  	 Gets the default type preference for a
+  	 host candidate. Defaults to 0.
+  	 </div>
+  
+  	@function getRelayTypePreference
+  	@return {Integer}
+   */
+
+  candidate.getRelayTypePreference = function() {
+    return fm.icelink.candidate.__relayTypePreference;
+  };
+
+
+  /*<span id='method-fm.icelink.candidate-getServerReflexiveTypePreference'>&nbsp;</span> */
+
+
+  /**
+  	 <div>
+  	 Gets the default type preference for a
+  	 host candidate. Defaults to 100.
+  	 </div>
+  
+  	@function getServerReflexiveTypePreference
+  	@return {Integer}
+   */
+
+  candidate.getServerReflexiveTypePreference = function() {
+    return fm.icelink.candidate.__serverReflexiveTypePreference;
   };
 
 
@@ -12383,6 +12561,90 @@ fm.icelink.candidate = (function(superClass) {
     var candidateMode;
     candidateMode = arguments[0];
     return fm.icelink.serializer.serializeCandidateMode(candidateMode);
+  };
+
+
+  /*<span id='method-fm.icelink.candidate-setHostTypePreference'>&nbsp;</span> */
+
+
+  /**
+  	 <div>
+  	 Sets the default type preference for a
+  	 host candidate. Defaults to 126.
+  	 </div>
+  
+  	@function setHostTypePreference
+  	@param {Integer} value
+  	@return {void}
+   */
+
+  candidate.setHostTypePreference = function() {
+    var value;
+    value = arguments[0];
+    return candidate.__hostTypePreference = value;
+  };
+
+
+  /*<span id='method-fm.icelink.candidate-setPeerReflexiveTypePreference'>&nbsp;</span> */
+
+
+  /**
+  	 <div>
+  	 Sets the default type preference for a
+  	 host candidate. Defaults to 110.
+  	 </div>
+  
+  	@function setPeerReflexiveTypePreference
+  	@param {Integer} value
+  	@return {void}
+   */
+
+  candidate.setPeerReflexiveTypePreference = function() {
+    var value;
+    value = arguments[0];
+    return candidate.__peerReflexiveTypePreference = value;
+  };
+
+
+  /*<span id='method-fm.icelink.candidate-setRelayTypePreference'>&nbsp;</span> */
+
+
+  /**
+  	 <div>
+  	 Sets the default type preference for a
+  	 host candidate. Defaults to 0.
+  	 </div>
+  
+  	@function setRelayTypePreference
+  	@param {Integer} value
+  	@return {void}
+   */
+
+  candidate.setRelayTypePreference = function() {
+    var value;
+    value = arguments[0];
+    return candidate.__relayTypePreference = value;
+  };
+
+
+  /*<span id='method-fm.icelink.candidate-setServerReflexiveTypePreference'>&nbsp;</span> */
+
+
+  /**
+  	 <div>
+  	 Sets the default type preference for a
+  	 host candidate. Defaults to 100.
+  	 </div>
+  
+  	@function setServerReflexiveTypePreference
+  	@param {Integer} value
+  	@return {void}
+   */
+
+  candidate.setServerReflexiveTypePreference = function() {
+    var value;
+    value = arguments[0];
+    return candidate.__serverReflexiveTypePreference = value;
   };
 
 
@@ -12621,6 +12883,14 @@ fm.icelink.candidate = (function(superClass) {
   candidate.prototype.toJson = function() {
     return fm.icelink.candidate.toJson(this);
   };
+
+  candidate.__hostTypePreference = 126;
+
+  candidate.__serverReflexiveTypePreference = 100;
+
+  candidate.__peerReflexiveTypePreference = 110;
+
+  candidate.__relayTypePreference = 0;
 
   return candidate;
 
@@ -14772,53 +15042,65 @@ fm.icelink.link = (function(superClass) {
   };
 
   link.prototype._createConnection = function() {
-    var audioTrack, audioTracks, channel, channelInfo, chromeVersion, dataChannel, dataChannelOptions, error, error1, error2, iceServer, iceServers, j, k, l, label, len, len1, len2, len3, len4, len5, localBackingStream, m, mediaIndex, n, o, optional, orderedDelivery, ref, ref1, ref2, relayPassword, relayPasswords, relayUsername, relayUsernames, remoteBackingStream, serverAddress, serverAddressIndex, subprotocol, track, tracks, videoTrack, videoTracks;
+    var audioTrack, audioTracks, channel, channelInfo, chromeVersion, dataChannel, dataChannelOptions, error, error1, error2, iceServer, iceServers, j, k, l, label, len, len1, len2, len3, len4, len5, len6, localBackingStream, m, mediaIndex, n, o, optional, orderedDelivery, p, rawServerAddress, ref, ref1, ref2, relayPassword, relayPasswords, relayUsername, relayUsernames, remoteBackingStream, serverAddress, serverAddressIndex, serverAddresses, subprotocol, track, tracks, videoTrack, videoTracks;
     iceServers = [];
     serverAddressIndex = -1;
     relayUsernames = this.getRelayUsernames();
     relayPasswords = this.getRelayPasswords();
     ref = this.getServerAddresses();
     for (j = 0, len = ref.length; j < len; j++) {
-      serverAddress = ref[j];
+      rawServerAddress = ref[j];
       serverAddressIndex++;
-      if (fm.stringExtensions.endsWith(serverAddress, '?transport=tcp')) {
-        continue;
-      }
-      fm.log.info('Server address is ' + serverAddress + '.');
-      if (!fm.stringExtensions.endsWith(serverAddress, '?transport=udp')) {
-        serverAddress += '?transport=udp';
-      }
-      iceServers.push({
-        urls: ['stun:' + serverAddress]
-      });
-      if (relayUsernames === null) {
-        relayUsername = null;
-      } else if (serverAddressIndex < relayUsernames.length) {
-        relayUsername = relayUsernames[serverAddressIndex];
+      serverAddresses = [];
+      if (fm.stringExtensions.endsWith(rawServerAddress, '?transport=udp')) {
+        serverAddresses.push(rawServerAddress);
+      } else if (fm.stringExtensions.endsWith(rawServerAddress, '?transport=tcp')) {
+        serverAddresses.push(rawServerAddress);
       } else {
-        relayUsername = relayUsernames[relayUsernames.length - 1];
+        serverAddresses.push(rawServerAddress + '?transport=udp');
+        serverAddresses.push(rawServerAddress + '?transport=tcp');
       }
-      if (relayPasswords === null) {
-        relayPassword = null;
-      } else if (serverAddressIndex < relayPasswords.length) {
-        relayPassword = relayPasswords[serverAddressIndex];
-      } else {
-        relayPassword = relayPasswords[relayPasswords.length - 1];
-      }
-      if (relayUsername !== null && relayPassword !== null && relayUsername !== '' && relayPassword !== '') {
-        if (navigator.mozGetUserMedia) {
-          iceServers.push({
-            urls: ['turn:' + serverAddress],
-            credential: relayPassword,
-            username: relayUsername
-          });
-        } else if (navigator.webkitGetUserMedia) {
-          chromeVersion = parseInt(navigator.userAgent.match(/Chrom(e|ium)\/([0-9]+)\./)[2]);
-          if (chromeVersion < 28) {
+      for (k = 0, len1 = serverAddresses.length; k < len1; k++) {
+        serverAddress = serverAddresses[k];
+        fm.log.info('Using ' + serverAddress + ' for STUN/TURN.');
+        iceServers.push({
+          urls: ['stun:' + serverAddress]
+        });
+        if (relayUsernames === null) {
+          relayUsername = null;
+        } else if (serverAddressIndex < relayUsernames.length) {
+          relayUsername = relayUsernames[serverAddressIndex];
+        } else {
+          relayUsername = relayUsernames[relayUsernames.length - 1];
+        }
+        if (relayPasswords === null) {
+          relayPassword = null;
+        } else if (serverAddressIndex < relayPasswords.length) {
+          relayPassword = relayPasswords[serverAddressIndex];
+        } else {
+          relayPassword = relayPasswords[relayPasswords.length - 1];
+        }
+        if (relayUsername !== null && relayPassword !== null && relayUsername !== '' && relayPassword !== '') {
+          if (navigator.mozGetUserMedia) {
             iceServers.push({
-              url: 'turn:' + relayUsername + '@' + serverAddress,
-              credential: relayPassword
+              urls: ['turn:' + serverAddress],
+              credential: relayPassword,
+              username: relayUsername
             });
+          } else if (navigator.webkitGetUserMedia) {
+            chromeVersion = parseInt(navigator.userAgent.match(/Chrom(e|ium)\/([0-9]+)\./)[2]);
+            if (chromeVersion < 28) {
+              iceServers.push({
+                url: 'turn:' + relayUsername + '@' + serverAddress,
+                credential: relayPassword
+              });
+            } else {
+              iceServers.push({
+                urls: ['turn:' + serverAddress],
+                credential: relayPassword,
+                username: relayUsername
+              });
+            }
           } else {
             iceServers.push({
               urls: ['turn:' + serverAddress],
@@ -14826,12 +15108,6 @@ fm.icelink.link = (function(superClass) {
               username: relayUsername
             });
           }
-        } else {
-          iceServers.push({
-            urls: ['turn:' + serverAddress],
-            credential: relayPassword,
-            username: relayUsername
-          });
         }
       }
     }
@@ -14861,8 +15137,8 @@ fm.icelink.link = (function(superClass) {
       } catch (error1) {
         error = error1;
         try {
-          for (k = 0, len1 = iceServers.length; k < len1; k++) {
-            iceServer = iceServers[k];
+          for (l = 0, len2 = iceServers.length; l < len2; l++) {
+            iceServer = iceServers[l];
             if (iceServer.urls) {
               iceServer.urls = iceServer.urls[0];
             }
@@ -14874,8 +15150,8 @@ fm.icelink.link = (function(superClass) {
           });
         } catch (error2) {
           error = error2;
-          for (l = 0, len2 = iceServers.length; l < len2; l++) {
-            iceServer = iceServers[l];
+          for (m = 0, len3 = iceServers.length; m < len3; m++) {
+            iceServer = iceServers[m];
             if (iceServer.urls) {
               iceServer.url = iceServer.urls;
               delete iceServer.urls;
@@ -14892,9 +15168,6 @@ fm.icelink.link = (function(superClass) {
         return function(event) {
           var candidate;
           if (event.candidate) {
-            if (/tcp/.test(event.candidate.candidate)) {
-              return;
-            }
             candidate = new fm.icelink.candidate();
             candidate.setSdpMediaIndex(event.candidate.sdpMLineIndex);
             candidate.setSdpCandidateAttribute(event.candidate.candidate);
@@ -15043,16 +15316,16 @@ fm.icelink.link = (function(superClass) {
         mediaIndex = 0;
         audioTracks = this._localStream.getBackingStream().getAudioTracks();
         videoTracks = this._localStream.getBackingStream().getVideoTracks();
-        for (m = 0, len3 = audioTracks.length; m < len3; m++) {
-          audioTrack = audioTracks[m];
+        for (n = 0, len4 = audioTracks.length; n < len4; n++) {
+          audioTrack = audioTracks[n];
           tracks.push({
             track: audioTrack,
             kind: 'audio',
             mediaIndex: mediaIndex++
           });
         }
-        for (n = 0, len4 = videoTracks.length; n < len4; n++) {
-          videoTrack = videoTracks[n];
+        for (o = 0, len5 = videoTracks.length; o < len5; o++) {
+          videoTrack = videoTracks[o];
           tracks.push({
             track: videoTrack,
             kind: 'video',
@@ -15067,8 +15340,8 @@ fm.icelink.link = (function(superClass) {
         this._rtpKinds = [];
         this._localParams = null;
         this._remoteParams = null;
-        for (o = 0, len5 = tracks.length; o < len5; o++) {
-          track = tracks[o];
+        for (p = 0, len6 = tracks.length; p < len6; p++) {
+          track = tracks[p];
           remoteBackingStream.addTrack(this._initializeTrack(track, iceServers));
         }
         this._remoteStream.setBackingStream(remoteBackingStream);
@@ -15087,9 +15360,6 @@ fm.icelink.link = (function(superClass) {
       return function(event) {
         var candidate, candidateObj, sdpCandidateAttribute, sdpCandidateAttributeParts, sdpMediaIndex;
         candidateObj = event.candidate;
-        if (candidateObj.protocol !== 'udp') {
-          return;
-        }
         sdpCandidateAttributeParts = [candidateObj.foundation, 1, candidateObj.protocol, candidateObj.priority, candidateObj.ip, candidateObj.port, 'typ', candidateObj.type];
         if (candidateObj.relatedAddress) {
           sdpCandidateAttributeParts = sdpCandidateAttributeParts.concat(['raddr', candidateObj.relatedAddress, 'rport', candidateObj.relatedPort]);
@@ -15130,9 +15400,6 @@ fm.icelink.link = (function(superClass) {
         iceServer = iceServers[j];
         if (fm.util.isArray(iceServer.urls)) {
           iceServer.urls = iceServer.urls[0];
-        }
-        if (!fm.stringExtensions.endsWith(iceServer.urls, '?transport=udp')) {
-          iceServer.urls += '?transport=udp';
         }
       }
       iceGatherer = new RTCIceGatherer({
@@ -15472,7 +15739,7 @@ fm.icelink.link = (function(superClass) {
             };
             if (_this.getCandidateMode() === fm.icelink.candidateMode.Early) {
               return window.setTimeout(function() {
-                var candidate, candidateAttribute, candidateAttributeChunks, componentId, i, ipAddress, j, k, l, len, len1, m, mediaIndex, medias, n, port, ref, ref1, ref2, ref3, rtcpCandidateAttribute, rtcpCandidateAttributeList, rtcpCandidateAttributes, rtpCandidateAttribute, rtpCandidateAttributeList, rtpCandidateAttributes, sdp, sdpChunks, session;
+                var candidate, candidateAttribute, candidateAttributeChunks, componentId, i, ipAddress, j, k, l, len, len1, len2, len3, m, mediaIndex, medias, n, o, p, port, ref, ref1, ref2, ref3, ref4, ref5, rtcpCandidateAttribute, rtcpCandidateAttributeList, rtcpCandidateAttributes, rtpCandidateAttribute, rtpCandidateAttributeList, rtpCandidateAttributes, sdp, sdpChunks, session;
                 sdp = sessionDescription.sdp;
                 sdpChunks = sdp.split('\nm=');
                 session = sdpChunks[0].trim();
@@ -15518,20 +15785,28 @@ fm.icelink.link = (function(superClass) {
                   if (rtcpCandidateAttributes.length === 0) {
                     rtcpCandidateAttributes = rtpCandidateAttributes;
                   }
-                  if (rtpCandidateAttributes.length > 0) {
-                    rtpCandidateAttribute = rtpCandidateAttributes[rtpCandidateAttributes.length - 1];
+                  ref4 = rtpCandidateAttributes.slice(0).reverse();
+                  for (o = 0, len2 = ref4.length; o < len2; o++) {
+                    rtpCandidateAttribute = ref4[o];
                     candidateAttributeChunks = rtpCandidateAttribute.split(' ');
                     ipAddress = candidateAttributeChunks[4];
                     port = candidateAttributeChunks[5];
-                    medias[i] = medias[i].replace(/m=(audio|video) [0-9]+/, 'm=$1 ' + port);
-                    medias[i] = medias[i].replace(/c=IN IP(4|6) [0-9.:]+/, 'c=IN IP$1 ' + ipAddress);
+                    if (port > 0) {
+                      medias[i] = medias[i].replace(/m=(audio|video) [0-9]+/, 'm=$1 ' + port);
+                      medias[i] = medias[i].replace(/c=IN IP(4|6) [0-9.:]+/, 'c=IN IP$1 ' + ipAddress);
+                      break;
+                    }
                   }
-                  if (rtcpCandidateAttributes.length > 0) {
-                    rtcpCandidateAttribute = rtcpCandidateAttributes[rtcpCandidateAttributes.length - 1];
+                  ref5 = rtcpCandidateAttributes.slice(0).reverse();
+                  for (p = 0, len3 = ref5.length; p < len3; p++) {
+                    rtcpCandidateAttribute = ref5[p];
                     candidateAttributeChunks = rtcpCandidateAttribute.split(' ');
                     ipAddress = candidateAttributeChunks[4];
                     port = candidateAttributeChunks[5];
-                    medias[i] = medias[i].replace(/a=rtcp:[0-9]+ IN IP(4|6) [0-9.:]+/, 'a=rtcp:' + port + ' IN IP$1 ' + ipAddress);
+                    if (port > 0) {
+                      medias[i] = medias[i].replace(/a=rtcp:[0-9]+ IN IP(4|6) [0-9.:]+/, 'a=rtcp:' + port + ' IN IP$1 ' + ipAddress);
+                      break;
+                    }
                   }
                 }
                 sdp = session + '\n' + medias.join('\n') + '\n';

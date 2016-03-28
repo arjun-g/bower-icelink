@@ -1,7 +1,7 @@
 
 /*
  * Title: WebSync Client for JavaScript
- * Version: 4.8.9
+ * Version: 4.9.1
  * Copyright Frozen Mountain Software 2011+
  */
 
@@ -25,7 +25,7 @@ if (!window.fm) { throw new Error("fm must be loaded before fm.websync."); }
 if (!window.fm.websync) { window.fm.websync = {}; }
 
 fm.websync.getVersion = function() {
-  return '4.8.9';
+  return '4.9.1';
 };
 
 

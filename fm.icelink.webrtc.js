@@ -1,7 +1,7 @@
 
 /*
  * Title: IceLink WebRTC Extension for JavaScript
- * Version: 2.8.9
+ * Version: 2.9.1
  * Copyright Frozen Mountain Software 2011+
  */
 
@@ -27,7 +27,7 @@ if (!window.fm.icelink) { throw new Error("fm.icelink must be loaded before fm.i
 if (!window.fm.icelink.webrtc) { window.fm.icelink.webrtc = {}; }
 
 fm.icelink.webrtc.getVersion = function() {
-  return '2.8.9';
+  return '2.9.1';
 };
 
 
@@ -7797,14 +7797,14 @@ fm.icelink.webrtc.linkExtensions = (function() {
 
   linkExtensions.getLocalAudioRenderProvider = function() {
     var index, link;
-    if (arguments.length === 1) {
-      link = arguments[0];
-      return fm.icelink.webrtc.linkExtensions.getLocalAudioRenderProvider(link, 0);
-    }
     if (arguments.length === 2) {
       link = arguments[0];
       index = arguments[1];
       return fm.global.tryCast(link.getDynamicValue(fm.stringExtensions.concat(fm.icelink.webrtc.linkExtensions._localAudioRenderKey, fm.intExtensions.toString(index))), fm.icelink.webrtc.audioRenderProvider);
+    }
+    if (arguments.length === 1) {
+      link = arguments[0];
+      return fm.icelink.webrtc.linkExtensions.getLocalAudioRenderProvider(link, 0);
     }
   };
 
@@ -7824,14 +7824,14 @@ fm.icelink.webrtc.linkExtensions = (function() {
 
   linkExtensions.getLocalVideoRenderProvider = function() {
     var index, link;
-    if (arguments.length === 1) {
-      link = arguments[0];
-      return fm.icelink.webrtc.linkExtensions.getLocalVideoRenderProvider(link, 0);
-    }
     if (arguments.length === 2) {
       link = arguments[0];
       index = arguments[1];
       return fm.global.tryCast(link.getDynamicValue(fm.stringExtensions.concat(fm.icelink.webrtc.linkExtensions._localVideoRenderKey, fm.intExtensions.toString(index))), fm.icelink.webrtc.videoRenderProvider);
+    }
+    if (arguments.length === 1) {
+      link = arguments[0];
+      return fm.icelink.webrtc.linkExtensions.getLocalVideoRenderProvider(link, 0);
     }
   };
 
@@ -7912,6 +7912,10 @@ fm.icelink.webrtc.linkExtensions = (function() {
 
   linkExtensions.getRemoteVideoControl = function() {
     var index, link, localVideoRenderProvider;
+    if (arguments.length === 1) {
+      link = arguments[0];
+      return fm.icelink.webrtc.linkExtensions.getRemoteVideoControl(link, 0);
+    }
     if (arguments.length === 2) {
       link = arguments[0];
       index = arguments[1];
@@ -7920,10 +7924,6 @@ fm.icelink.webrtc.linkExtensions = (function() {
         return null;
       }
       return localVideoRenderProvider.getControl();
-    }
-    if (arguments.length === 1) {
-      link = arguments[0];
-      return fm.icelink.webrtc.linkExtensions.getRemoteVideoControl(link, 0);
     }
   };
 
@@ -8125,6 +8125,74 @@ fm.icelink.webrtc.linkExtensions = (function() {
     link = arguments[0];
     remoteDataSsrcMap = arguments[1];
     return link.setDynamicValue(fm.icelink.webrtc.linkExtensions._dataChannelSsrcMapKey, remoteDataSsrcMap);
+  };
+
+
+  /*<span id='method-fm.icelink.webrtc.linkExtensions-setDeltaFecParameters'>&nbsp;</span> */
+
+
+  /**
+  	 <div>
+  	 Sets the delta-frame FEC parameters for a remote video stream.
+  	 </div>
+  	@function setDeltaFecParameters
+  	@param {fm.icelink.link} link The link.
+  	@param {Integer} index The index of the video stream.
+  	@param {fm.icelink.webrtc.fecProtectionParameters} deltaFecParameters The delta-frame FEC parameters.
+  	@return {void}
+   */
+
+  linkExtensions.setDeltaFecParameters = function() {
+    var deltaFecParameters, index, link, remoteVideoRenderProvider;
+    if (arguments.length === 2) {
+      link = arguments[0];
+      deltaFecParameters = arguments[1];
+      fm.icelink.webrtc.linkExtensions.setDeltaFecParameters(link, 0, deltaFecParameters);
+      return;
+    }
+    if (arguments.length === 3) {
+      link = arguments[0];
+      index = arguments[1];
+      deltaFecParameters = arguments[2];
+      remoteVideoRenderProvider = fm.icelink.webrtc.linkExtensions.getRemoteVideoRenderProvider(link, index);
+      if (!fm.global.equals(remoteVideoRenderProvider, null)) {
+        remoteVideoRenderProvider.setDeltaFecParameters(deltaFecParameters);
+      }
+    }
+  };
+
+
+  /*<span id='method-fm.icelink.webrtc.linkExtensions-setKeyFecParameters'>&nbsp;</span> */
+
+
+  /**
+  	 <div>
+  	 Sets the keyframe FEC parameters for a remote video stream.
+  	 </div>
+  	@function setKeyFecParameters
+  	@param {fm.icelink.link} link The link.
+  	@param {Integer} index The index of the video stream.
+  	@param {fm.icelink.webrtc.fecProtectionParameters} keyFecParameters The keyframe FEC parameters.
+  	@return {void}
+   */
+
+  linkExtensions.setKeyFecParameters = function() {
+    var index, keyFecParameters, link, remoteVideoRenderProvider;
+    if (arguments.length === 3) {
+      link = arguments[0];
+      index = arguments[1];
+      keyFecParameters = arguments[2];
+      remoteVideoRenderProvider = fm.icelink.webrtc.linkExtensions.getRemoteVideoRenderProvider(link, index);
+      if (!fm.global.equals(remoteVideoRenderProvider, null)) {
+        remoteVideoRenderProvider.setKeyFecParameters(keyFecParameters);
+      }
+      return;
+    }
+    if (arguments.length === 2) {
+      link = arguments[0];
+      keyFecParameters = arguments[1];
+      fm.icelink.webrtc.linkExtensions.setKeyFecParameters(link, 0, keyFecParameters);
+    }
   };
 
   linkExtensions.setLocalAudioRenderProvider = function() {
@@ -8646,6 +8714,66 @@ fm.icelink.webrtc.linkExtensions = (function() {
     remoteDataSsrcMap = arguments[0];
     Array.prototype.splice.call(arguments, 0, 0, this);
     return fm.icelink.webrtc.linkExtensions.setDataChannelSsrcMap.apply(this, arguments);
+  };
+
+
+  /*<span id='method-fm.icelink.webrtc.linkExtensions-setDeltaFecParameters'>&nbsp;</span> */
+
+
+  /**
+  	 <div>
+  	 Sets the delta-frame FEC parameters for a remote video stream.
+  	 </div>
+  	@function setDeltaFecParameters
+  	@param {Integer} index The index of the video stream.
+  	@param {fm.icelink.webrtc.fecProtectionParameters} deltaFecParameters The delta-frame FEC parameters.
+  	@return {void}
+   */
+
+  fm.icelink.link.prototype.setDeltaFecParameters = function() {
+    var deltaFecParameters, index;
+    if (arguments.length === 1) {
+      deltaFecParameters = arguments[0];
+      Array.prototype.splice.call(arguments, 0, 0, this);
+      return fm.icelink.webrtc.linkExtensions.setDeltaFecParameters.apply(this, arguments);
+      return;
+    }
+    if (arguments.length === 2) {
+      index = arguments[0];
+      deltaFecParameters = arguments[1];
+      Array.prototype.splice.call(arguments, 0, 0, this);
+      return fm.icelink.webrtc.linkExtensions.setDeltaFecParameters.apply(this, arguments);
+    }
+  };
+
+
+  /*<span id='method-fm.icelink.webrtc.linkExtensions-setKeyFecParameters'>&nbsp;</span> */
+
+
+  /**
+  	 <div>
+  	 Sets the keyframe FEC parameters for a remote video stream.
+  	 </div>
+  	@function setKeyFecParameters
+  	@param {Integer} index The index of the video stream.
+  	@param {fm.icelink.webrtc.fecProtectionParameters} keyFecParameters The keyframe FEC parameters.
+  	@return {void}
+   */
+
+  fm.icelink.link.prototype.setKeyFecParameters = function() {
+    var index, keyFecParameters;
+    if (arguments.length === 1) {
+      keyFecParameters = arguments[0];
+      Array.prototype.splice.call(arguments, 0, 0, this);
+      return fm.icelink.webrtc.linkExtensions.setKeyFecParameters.apply(this, arguments);
+      return;
+    }
+    if (arguments.length === 2) {
+      index = arguments[0];
+      keyFecParameters = arguments[1];
+      Array.prototype.splice.call(arguments, 0, 0, this);
+      return fm.icelink.webrtc.linkExtensions.setKeyFecParameters.apply(this, arguments);
+    }
   };
 
   fm.icelink.link.prototype.setLocalAudioRenderProvider = function() {
@@ -10524,15 +10652,23 @@ fm.icelink.webrtc.jsAudioCaptureProvider = (function(superClass) {
   extend(jsAudioCaptureProvider, superClass);
 
   function jsAudioCaptureProvider() {
+    this.getDeviceNames = bind(this.getDeviceNames, this);
     this.getLabel = bind(this.getLabel, this);
     this.setLocalStream = bind(this.setLocalStream, this);
     return jsAudioCaptureProvider.__super__.constructor.apply(this, arguments);
   }
 
-  jsAudioCaptureProvider.prototype.setLocalStream = function(localStream) {};
+  jsAudioCaptureProvider.prototype.setLocalStream = function(localStream, deviceNames) {
+    this._localStream = localStream;
+    return this._deviceNames = deviceNames;
+  };
 
   jsAudioCaptureProvider.prototype.getLabel = function() {
     return 'Audio Input';
+  };
+
+  jsAudioCaptureProvider.prototype.getDeviceNames = function() {
+    return this._deviceNames;
   };
 
   return jsAudioCaptureProvider;
@@ -10559,6 +10695,7 @@ fm.icelink.webrtc.jsVideoCaptureProvider = (function(superClass) {
   extend(jsVideoCaptureProvider, superClass);
 
   function jsVideoCaptureProvider(previewScale) {
+    this.getDeviceNames = bind(this.getDeviceNames, this);
     this.getLabel = bind(this.getLabel, this);
     this.getPreviewControl = bind(this.getPreviewControl, this);
     this.setLocalStream = bind(this.setLocalStream, this);
@@ -10566,7 +10703,9 @@ fm.icelink.webrtc.jsVideoCaptureProvider = (function(superClass) {
     this._renderProvider = new fm.icelink.webrtc.jsVideoRenderProvider(previewScale, true);
   }
 
-  jsVideoCaptureProvider.prototype.setLocalStream = function(localStream, mirror) {
+  jsVideoCaptureProvider.prototype.setLocalStream = function(localStream, deviceNames, mirror) {
+    this._localStream = localStream;
+    this._deviceNames = deviceNames;
     return this._renderProvider.setLocalStream(localStream, mirror);
   };
 
@@ -10589,6 +10728,10 @@ fm.icelink.webrtc.jsVideoCaptureProvider = (function(superClass) {
 
   jsVideoCaptureProvider.prototype.getLabel = function() {
     return 'Video Input';
+  };
+
+  jsVideoCaptureProvider.prototype.getDeviceNames = function() {
+    return this._deviceNames;
   };
 
   return jsVideoCaptureProvider;
@@ -11025,15 +11168,23 @@ fm.icelink.webrtc.pluginAudioCaptureProvider = (function(superClass) {
   extend(pluginAudioCaptureProvider, superClass);
 
   function pluginAudioCaptureProvider() {
+    this.getDeviceNames = bind(this.getDeviceNames, this);
     this.getLabel = bind(this.getLabel, this);
     this.setLocalStream = bind(this.setLocalStream, this);
     return pluginAudioCaptureProvider.__super__.constructor.apply(this, arguments);
   }
 
-  pluginAudioCaptureProvider.prototype.setLocalStream = function(localStream) {};
+  pluginAudioCaptureProvider.prototype.setLocalStream = function(localStream, deviceNames) {
+    this._localStream = localStream;
+    return this._deviceNames = deviceNames;
+  };
 
   pluginAudioCaptureProvider.prototype.getLabel = function() {
     return 'Audio Input';
+  };
+
+  pluginAudioCaptureProvider.prototype.getDeviceNames = function() {
+    return this._deviceNames;
   };
 
   return pluginAudioCaptureProvider;
@@ -11060,6 +11211,7 @@ fm.icelink.webrtc.pluginVideoCaptureProvider = (function(superClass) {
   extend(pluginVideoCaptureProvider, superClass);
 
   function pluginVideoCaptureProvider(previewScale) {
+    this.getDeviceNames = bind(this.getDeviceNames, this);
     this.getLabel = bind(this.getLabel, this);
     this.getPreviewControl = bind(this.getPreviewControl, this);
     this.setLocalStream = bind(this.setLocalStream, this);
@@ -11067,7 +11219,9 @@ fm.icelink.webrtc.pluginVideoCaptureProvider = (function(superClass) {
     this._renderProvider = new fm.icelink.webrtc.pluginVideoRenderProvider(previewScale, true);
   }
 
-  pluginVideoCaptureProvider.prototype.setLocalStream = function(localStream) {
+  pluginVideoCaptureProvider.prototype.setLocalStream = function(localStream, deviceNames) {
+    this._localStream = localStream;
+    this._deviceNames = deviceNames;
     return this._renderProvider.setLocalStream(localStream);
   };
 
@@ -11090,6 +11244,10 @@ fm.icelink.webrtc.pluginVideoCaptureProvider = (function(superClass) {
 
   pluginVideoCaptureProvider.prototype.getLabel = function() {
     return 'Video Input';
+  };
+
+  pluginVideoCaptureProvider.prototype.getDeviceNames = function() {
+    return this._deviceNames;
   };
 
   return pluginVideoCaptureProvider;
@@ -12023,6 +12181,7 @@ fm.icelink.webrtc.localMediaStream = (function(superClass) {
     this.raiseStartSuccess = bind(this.raiseStartSuccess, this);
     this.doStart = bind(this.doStart, this);
     this.getDeviceId = bind(this.getDeviceId, this);
+    this.getDeviceNames = bind(this.getDeviceNames, this);
     this.start = bind(this.start, this);
     this.stop = bind(this.stop, this);
     this.initialize = bind(this.initialize, this);
@@ -12040,6 +12199,8 @@ fm.icelink.webrtc.localMediaStream = (function(superClass) {
     this.getVideoCaptureProvider = bind(this.getVideoCaptureProvider, this);
     this.setAudioCaptureProvider = bind(this.setAudioCaptureProvider, this);
     this.getAudioCaptureProvider = bind(this.getAudioCaptureProvider, this);
+    this.getVideoDeviceNames = bind(this.getVideoDeviceNames, this);
+    this.getAudioDeviceNames = bind(this.getAudioDeviceNames, this);
     this.raiseVideoResumed = bind(this.raiseVideoResumed, this);
     this.raiseAudioResumed = bind(this.raiseAudioResumed, this);
     this.raiseVideoPaused = bind(this.raiseVideoPaused, this);
@@ -12451,6 +12612,24 @@ fm.icelink.webrtc.localMediaStream = (function(superClass) {
 
   localMediaStream.prototype._initialized = false;
 
+  localMediaStream.prototype.getAudioDeviceNames = function() {
+    var acp;
+    acp = this._audioCaptureProvider;
+    if (acp) {
+      return acp.getDeviceNames();
+    }
+    return [];
+  };
+
+  localMediaStream.prototype.getVideoDeviceNames = function() {
+    var vcp;
+    vcp = this._videoCaptureProvider;
+    if (vcp) {
+      return vcp.getDeviceNames();
+    }
+    return [];
+  };
+
 
   /*<span id='method-fm.icelink.webrtc.localMediaStream-getAudioCaptureProvider'>&nbsp;</span> */
 
@@ -12814,9 +12993,101 @@ fm.icelink.webrtc.localMediaStream = (function(superClass) {
     }
   };
 
+  localMediaStream.prototype.getDeviceNames = function(kind, callback) {
+    var error1, error2, ex;
+    if (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices) {
+      try {
+        return navigator.mediaDevices.enumerateDevices().then((function(_this) {
+          return function(devices) {
+            var device, deviceNames, i, index, len;
+            deviceNames = [];
+            index = -1;
+            for (i = 0, len = devices.length; i < len; i++) {
+              device = devices[i];
+              if (device.kind === kind || device.kind === kind + 'input') {
+                index++;
+                if (device.label) {
+                  deviceNames.push(device.label);
+                } else if (kind === 'audio') {
+                  deviceNames.push('Audio Input ' + index);
+                } else if (kind === 'video') {
+                  deviceNames.push('Video Input ' + index);
+                }
+              }
+            }
+            return callback(deviceNames);
+          };
+        })(this))["catch"]((function(_this) {
+          return function() {
+            return callback([]);
+          };
+        })(this));
+      } catch (error1) {
+        ex = error1;
+        return callback([]);
+      }
+    } else if (MediaStreamTrack && MediaStreamTrack.getSources) {
+      try {
+        return MediaStreamTrack.getSources((function(_this) {
+          return function(sources) {
+            var deviceNames, i, index, len, source;
+            deviceNames = [];
+            index = -1;
+            for (i = 0, len = sources.length; i < len; i++) {
+              source = sources[i];
+              if (source.kind === kind || source.kind === kind + 'input') {
+                index++;
+                if (source.label) {
+                  deviceNames.push(source.label);
+                } else if (kind === 'audio') {
+                  deviceNames.push('Audio Input ' + index);
+                } else if (kind === 'video') {
+                  deviceNames.push('Video Input ' + index);
+                }
+              }
+            }
+            return callback(deviceNames);
+          };
+        })(this));
+      } catch (error2) {
+        ex = error2;
+        return callback([]);
+      }
+    } else {
+      return callback([]);
+    }
+  };
+
   localMediaStream.prototype.getDeviceId = function(deviceNumber, kind, callback) {
-    var error1, ex;
-    if (MediaStreamTrack && MediaStreamTrack.getSources) {
+    var error1, error2, ex;
+    if (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices) {
+      try {
+        return navigator.mediaDevices.enumerateDevices().then((function(_this) {
+          return function(devices) {
+            var device, i, index, len;
+            index = -1;
+            for (i = 0, len = devices.length; i < len; i++) {
+              device = devices[i];
+              if (device.kind === kind || device.kind === kind + 'input') {
+                index++;
+                if (index === deviceNumber) {
+                  callback(device.deviceId);
+                  return;
+                }
+              }
+            }
+            return callback(null);
+          };
+        })(this))["catch"]((function(_this) {
+          return function() {
+            return callback(null);
+          };
+        })(this));
+      } catch (error1) {
+        ex = error1;
+        return callback(null);
+      }
+    } else if (MediaStreamTrack && MediaStreamTrack.getSources) {
       try {
         return MediaStreamTrack.getSources((function(_this) {
           return function(sources) {
@@ -12835,8 +13106,8 @@ fm.icelink.webrtc.localMediaStream = (function(superClass) {
             return callback(null);
           };
         })(this));
-      } catch (error1) {
-        ex = error1;
+      } catch (error2) {
+        ex = error2;
         return callback(null);
       }
     } else {
@@ -12887,17 +13158,37 @@ fm.icelink.webrtc.localMediaStream = (function(superClass) {
     } else if (arguments.length === 4) {
       getUserMediaSuccess = (function(_this) {
         return function(localStream) {
-          var acp, vcp;
+          var acp, audioReady, vcp, videoReady;
           _this.setBackingStream(localStream);
           acp = _this.getAudioCaptureProvider();
           vcp = _this.getVideoCaptureProvider();
+          audioReady = false;
+          videoReady = false;
           if (acp) {
-            acp.setLocalStream(_this);
+            _this.getDeviceNames('audio', function(deviceNames) {
+              acp.setLocalStream(_this, deviceNames);
+              audioReady = true;
+              if (videoReady) {
+                return _this.raiseStartSuccess(startArgs, localStream);
+              }
+            });
+          } else {
+            audioReady = true;
           }
           if (vcp) {
-            vcp.setLocalStream(_this, startArgs.getDefaultVideoSource() !== fm.icelink.webrtc.videoSource.Screen);
+            _this.getDeviceNames('video', function(deviceNames) {
+              vcp.setLocalStream(_this, deviceNames, startArgs.getDefaultVideoSource() !== fm.icelink.webrtc.videoSource.Screen);
+              videoReady = true;
+              if (audioReady) {
+                return _this.raiseStartSuccess(startArgs, localStream);
+              }
+            });
+          } else {
+            videoReady = true;
           }
-          return _this.raiseStartSuccess(startArgs, localStream);
+          if (audioReady && videoReady) {
+            return _this.raiseStartSuccess(startArgs, localStream);
+          }
         };
       })(this);
       getUserMediaFailure = (function(_this) {
@@ -12954,7 +13245,9 @@ fm.icelink.webrtc.localMediaStream = (function(superClass) {
             echoCancellation: true
           };
           if (audioDeviceId) {
-            audio.deviceId = audioDeviceId;
+            audio.deviceId = {
+              exact: audioDeviceId
+            };
           }
           if (fm.util.isPlainObject(audioParams)) {
             for (k in audioParams) {
@@ -13023,7 +13316,9 @@ fm.icelink.webrtc.localMediaStream = (function(superClass) {
             }
           }
           if (videoDeviceId) {
-            video.deviceId = videoDeviceId;
+            video.deviceId = {
+              exact: videoDeviceId
+            };
           }
           if (fm.util.isPlainObject(videoParams)) {
             for (k in videoParams) {
@@ -13695,8 +13990,8 @@ fm.icelink.webrtc.layoutManager = (function(superClass) {
   })(this);
   fm.icelink.webrtc.getCoreActiveX = function(args) {
     var x64_cc_classId, x86_cc_classId;
-    x86_cc_classId = 'D3579C7A-213E-19F1-36D7-FFFB7F5BAF66';
-    x64_cc_classId = 'CD2F5C3D-ACA2-5C31-672B-7D473BBC8829';
+    x86_cc_classId = '9B2708FE-F261-2405-A9D5-B03B777336B3';
+    x64_cc_classId = 'EF5EFB6E-BE11-B5A0-F4D4-CB22ED5A445E';
     return fm.icelink.webrtc.getActiveX(fm.util.extend({
       id: 'static',
       className: 'FM.IceLink.WebRTC.ActiveX.CoreControl',
@@ -13731,8 +14026,8 @@ fm.icelink.webrtc.layoutManager = (function(superClass) {
   };
   return fm.icelink.webrtc.getVideoContainerActiveX = function(args) {
     var x64_vcc_classId, x86_vcc_classId;
-    x86_vcc_classId = '4FBA8D86-15F0-39FB-A315-45FACCD55D28';
-    x64_vcc_classId = '81C19F92-EDB6-425F-6217-F5D6F5E0F007';
+    x86_vcc_classId = '9E181E4A-26FC-8BD2-D81F-1656DC5BAB5D';
+    x64_vcc_classId = '82594D99-CEE8-17A5-EF5F-CF585F3A54FB';
     return fm.icelink.webrtc.getActiveX(fm.util.extend({
       className: 'FM.IceLink.WebRTC.ActiveX.VideoContainerControl',
       classId: window.navigator.cpuClass === 'x86' ? x86_vcc_classId : x64_vcc_classId
@@ -14436,7 +14731,7 @@ fm.icelink.webrtc.layoutManager = (function(superClass) {
               }
               return self.jca['lms_' + prop](self.pid, args.toJson(), {
                 onSuccess: (function(_this) {
-                  return function(json) {
+                  return function(json, audioDeviceNamesJson, videoDeviceNamesJson) {
                     var acp, e, handler, vcp;
                     fm.util.observe(window, 'beforeunload', function() {
                       self.stop();
@@ -14444,10 +14739,10 @@ fm.icelink.webrtc.layoutManager = (function(superClass) {
                     acp = self.getAudioCaptureProvider();
                     vcp = self.getVideoCaptureProvider();
                     if (acp) {
-                      acp.setLocalStream(self);
+                      acp.setLocalStream(self, audioDeviceNamesJson ? fm.json.deserialize(audioDeviceNamesJson) : []);
                     }
                     if (vcp) {
-                      vcp.setLocalStream(self);
+                      vcp.setLocalStream(self, videoDeviceNamesJson ? fm.json.deserialize(videoDeviceNamesJson) : []);
                     }
                     handler = args.getOnSuccess();
                     if (handler) {
